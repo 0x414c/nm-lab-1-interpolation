@@ -1,0 +1,4 @@
+#ifndef NUMERICTYPES_HXX
+#define NUMERICTYPES_HXX
+
+#endif // NUMERICTYPES_HXX

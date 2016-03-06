@@ -1,0 +1,11 @@
+#ifndef NUMERICTYPES_HXX
+#define NUMERICTYPES_HXX
+
+
+#include <boost/multiprecision/float128.hpp>
+
+
+using real = boost::multiprecision::float128;
+
+
+#endif // NUMERICTYPES_HXX
