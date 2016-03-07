@@ -4,23 +4,25 @@
 
 #include <functional>
 
+#include "numerictypes.hxx"
+
 
 namespace Math
 {
   using std::function;
 
 
-  double f (
-    double x,
-    double alpha, double beta, double gamma,
-    double delta, double epsilon, double mu
+  Float f (
+    Float x,
+    Float alpha, Float beta, Float gamma,
+    Float delta, Float epsilon, Float mu
   );
 
-  double d (const function<double (double)>& func, double x, double delta);
+  Float d (const function<Float (Float)>& func, Float x, Float delta);
 
-  double r_n (
-    const function<double (double)>& f, const function<double (double)>& P_n,
-    double x, double t
+  Float r_n (
+    const function<Float (Float)>& f, const function<Float (Float)>& P_n,
+    Float x, Float t
   );
 
 

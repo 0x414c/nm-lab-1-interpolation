@@ -1,27 +1,29 @@
-﻿#include "newtonpolynomial.hxx"
-
-#include <cmath>
-#include <cstdlib>
+﻿#include <cmath>
+#include <cstddef>
 
 #include <functional>
+#include <iostream>
 #include <stdexcept>
 #include <vector>
 
-#include <QDebug>
+#ifdef MULTIPRECISION_ENABLED
+#include <boost/math/special_functions/fpclassify.hpp>
+#endif // MULTIPRECISION_ENABLED
 
 #include "mathutils.hxx"
+#include "newtonpolynomial.hxx"
 #include "numerictypes.hxx"
 
 
 namespace Math
 {
   NewtonPolynomial::NewtonPolynomial (
-    const std::function<double (double)>& func,
-    double x_0, double x_n_1, size_t n
+    const std::function<Float (Float)>& func,
+    Float x_0, Float x_n_1, size_t n
   ) throw (std::invalid_argument) :
     n_ (n)
   {
-    qDebug () << "!!" << x_0 << x_n_1 << n;
+    std::clog << '!' << x_0 << ' ' << x_n_1 << ' ' << n << std::endl;
 
     if (n_ == 0)
     {
@@ -33,35 +35,39 @@ namespace Math
       throw std::invalid_argument ("`x_0' should be less or equal to `x_n_1'.");
     }
 
-    finDiffs_ = std::vector<std::vector<double>> (n_);
+    finDiffs_ = std::vector<std::vector<Float>> (n_);
 
     for (size_t i (0); i < n_; ++i)
     {
-      finDiffs_[i] = std::vector<double> (n_ - i);
+      finDiffs_[i] = std::vector<Float> (n_ - i);
     }
 
-    x_ = std::vector<double> (n_);
+    x_ = std::vector<Float> (n_);
 
-    const double h ((x_n_1 - x_0) / double ((n > 1) ? (n_ - 1) : 1));
+    const Float h ((x_n_1 - x_0) / Float ((n > 1) ? (n_ - 1) : 1));
 
-    qDebug () << "h=" << h;
+//    std::clog << "h=" << h << std::endl;
 
     for (size_t k (0); k < n_; ++k)
     {
-      x_[k] = x_0 + double (k) * h;
+      x_[k] = x_0 + Float (k) * h;
 
-      const double y_k (func (x_[k]));
+      const Float y_k (func (x_[k]));
 
+#ifdef MULTIPRECISION_ENABLED
+      if (boost::math::isnan (y_k))
+#else
       if (std::isnan (y_k))
+#endif // MULTIPRECISION_ENABLED
       {
-        finDiffs_[0][k] = 0.;
+        finDiffs_[0][k] = 0;
       }
       else
       {
         finDiffs_[0][k] = y_k;
       }
 
-      qDebug () << "k=" << k << "x=" << x_[k] << "y=" << finDiffs_[0][k];
+//      std::clog << "k=" << k << ", x=" << x_[k] << ", y=" << finDiffs_[0][k] << std::endl;
     }
 
     for (size_t i (1); i < n_; ++i)
@@ -70,20 +76,21 @@ namespace Math
       {
         finDiffs_[i][j] = finDiffs_[i - 1][j + 1] - finDiffs_[i - 1][j];
 
-//        qDebug () << i << j << finDiffs_[i][j];
+//        std::clog << i << ' ' << j << ' ' << finDiffs_[i][j] << std::endl;
       }
     }
   }
 
 
-  double
-  NewtonPolynomial::operator () (double t) const
+  Float
+  NewtonPolynomial::operator () (Float t) const
   {
-    double acc (0.);
+    Float acc (0);
 
     for (size_t k (0); k < n_; ++k)
     {
-      acc += ffac_g (t, double (k)) / fac_g (double (k)) * finDiffs_[k][0];
+      acc += fallingFactorial_g (t, Float (k)) / factorial_g (Float (k)) *
+             finDiffs_[k][0];
     }
 
     return acc;

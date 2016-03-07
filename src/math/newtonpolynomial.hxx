@@ -1,11 +1,14 @@
 ﻿#ifndef NEWTONPOLYNOMIAL_HXX
 #define NEWTONPOLYNOMIAL_HXX
 
-#include <cstdlib>
+
+#include <cstddef>
 
 #include <functional>
 #include <stdexcept>
 #include <vector>
+
+#include "numerictypes.hxx"
 
 
 namespace Math
@@ -14,17 +17,17 @@ namespace Math
   {
     public:
       NewtonPolynomial (
-        const std::function<double (double)>& func,
-        double x_0, double x_n_1, size_t n
+        const std::function<Float (Float)>& func,
+        Float x_0, Float x_n_1, size_t n
       ) throw (std::invalid_argument);
 
-      double operator () (double t) const;
+      Float operator () (Float t) const;
 
 
     private:
-      std::vector<std::vector<double>> finDiffs_;
+      std::vector<std::vector<Float>> finDiffs_;
 
-      std::vector<double> x_;
+      std::vector<Float> x_;
 
       size_t n_;
   };

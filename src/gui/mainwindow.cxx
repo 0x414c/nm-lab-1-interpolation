@@ -1,7 +1,5 @@
-﻿#include "mainwindow.hxx"
-
-#include <cmath>
-#include <cstdlib>
+﻿#include <cmath>
+#include <cstddef>
 
 #include <algorithm>
 #include <functional>
@@ -22,10 +20,12 @@
 
 #include "ui_mainwindow.h"
 
+#include "mainwindow.hxx"
 #include "../config.hxx"
 #include "../math/functions.hxx"
 #include "../math/mathutils.hxx"
 #include "../math/newtonpolynomial.hxx"
+#include "../math/numerictypes.hxx"
 
 
 #pragma region init/destroy
@@ -608,7 +608,7 @@ MainWindow::setDirty (bool isDirty)
 
   if (isDirty_ && liveUpdateEnabled_)
   {
-    // TODO: ~! Update only modified parts of the plot.
+    // TODO: ~! Update only parts of the plot that were modified.
     updateCustomPlot (ui_->plot_functions_CustomPlot);
   }
 }
@@ -760,7 +760,7 @@ MainWindow::updateCustomPlot (QCustomPlot* const customPlot)
 
 //  qDebug () << "samplesCount ==" << samplesCount;
 
-  const function<double (double)> f (
+  const function<Math::Float (Math::Float)> f (
     std::bind (
       Math::f,
       _1, funcParam_alpha_, funcParam_beta_, funcParam_gamma_,
@@ -768,7 +768,7 @@ MainWindow::updateCustomPlot (QCustomPlot* const customPlot)
     )
   );
 
-  const function<double (double)> d_f (
+  const function<Math::Float (Math::Float)> d_f (
     std::bind (
       Math::d, f, _1, interpParam_delta_
     )
@@ -778,25 +778,25 @@ MainWindow::updateCustomPlot (QCustomPlot* const customPlot)
     f, wndParam_A_, wndParam_B_, interpParam_n_
   );
 
-  const function<double (double)> d_P_n (
+  const function<Math::Float (Math::Float)> d_P_n (
     std::bind (
       Math::d,
       P_n,
       std::bind (
         Math::lerp,
-        wndParam_A_, 0., wndParam_B_, double (interpParam_n_) - 1., _1
+        wndParam_A_, 0, wndParam_B_, interpParam_n_ - 1, _1
       ),
       interpParam_delta_
     )
   );
 
-  const function<double (double)> r_n (
+  const function<Math::Float (Math::Float)> r_n (
     std::bind (
       Math::r_n,
       f, P_n, _1,
       std::bind (
         Math::lerp,
-        wndParam_A_, 0., wndParam_B_, double (interpParam_n_) - 1., _1
+        wndParam_A_, 0, wndParam_B_, interpParam_n_ - 1, _1
       )
     )
   );
@@ -861,7 +861,7 @@ MainWindow::updateCustomPlot (QCustomPlot* const customPlot)
 
 void
 MainWindow::plotFunction (
-  const std::function<double (double)>& func, int samplesCount,
+  const std::function<Math::Float (Math::Float)>& func, int samplesCount,
   double keyStart, double keyEnd, double valueStart, double valueEnd,
   const QColor& color, QCustomPlot* const customPlot, const QString& name
 )
@@ -872,9 +872,9 @@ MainWindow::plotFunction (
   {
     const double key (
       Math::lerp (
-        0., keyStart,
-        double (samplesCount) - 1., keyEnd,
-        double (sampleIdx)
+        0, keyStart,
+        samplesCount - 1, keyEnd,
+        sampleIdx
       )
     );
     const double value (func (key));
@@ -887,7 +887,7 @@ MainWindow::plotFunction (
     }
     else
     {
-      values[sampleIdx] = Math::clamp (valueStart, valueEnd, value);
+      values[sampleIdx] = double (Math::clamp (valueStart, valueEnd, value));
     }
   }
 
@@ -906,7 +906,7 @@ MainWindow::plotFunction (
 
 void
 MainWindow::plotPolynomial (
-  const std::function<double (double)>& func, int samplesCount, int stepsCount,
+  const std::function<Math::Float (Math::Float)>& func, int samplesCount, int stepsCount,
   double keyStart, double keyEnd, double valueStart, double valueEnd,
   const QColor& color, QCustomPlot* const customPlot, const QString& name
 )
@@ -917,24 +917,32 @@ MainWindow::plotPolynomial (
   {
     const double key (
       Math::lerp (
-        0., keyStart,
-        double (samplesCount) - 1., keyEnd,
-        double (sampleIdx)
+        0, keyStart,
+        samplesCount - 1, keyEnd,
+        sampleIdx
       )
     );
 
     const double value (
       func (
         Math::lerp (
-          0., 0.,
-          double (samplesCount) - 1., double (stepsCount) - 1.,
-          double (sampleIdx)
+          0, 0,
+          samplesCount - 1, stepsCount - 1,
+          sampleIdx
         )
       )
     );
 
     keys[sampleIdx] = key;
-    values[sampleIdx] = Math::clamp (valueStart, valueEnd, value);
+
+    if (std::isnan (value))
+    {
+      values[sampleIdx] = std::numeric_limits<double>::quiet_NaN ();
+    }
+    else
+    {
+      values[sampleIdx] = double (Math::clamp (valueStart, valueEnd, value));
+    }
   }
 
   QCPGraph* const graph (customPlot->addGraph ());
@@ -992,20 +1000,20 @@ MainWindow::plotBoundingBox (
 
 void
 MainWindow::plotMax (
-  const std::function<double (double)>& func, int samplesCount,
+  const std::function<Math::Float (Math::Float)>& func, int samplesCount,
   double keyStart, double keyEnd, const QColor& color,
   QCustomPlot* const customPlot
 )
 {
-  double maxKey (0.), maxValue (0.);
+  double maxKey (0), maxValue (0);
 
   for (int sampleIdx (0); sampleIdx < samplesCount; ++sampleIdx)
   {
     const double key (
       Math::lerp (
-        0., keyStart,
-        double (samplesCount) - 1., keyEnd,
-        double (sampleIdx)
+        0, keyStart,
+        samplesCount - 1, keyEnd,
+        sampleIdx
       )
     );
     const double value (func (key));
@@ -1022,12 +1030,12 @@ MainWindow::plotMax (
   line->setSelectedPen (
     QPen (QBrush (color), Config::GUI::PlotParams::SelectedPenWidth)
   );
-  line->point1->setCoords (maxKey, -1.);
-  line->point2->setCoords (maxKey, 1.);
+  line->point1->setCoords (maxKey, -1);
+  line->point2->setCoords (maxKey, 1);
   line->setSelectable (true);
   customPlot->addItem (line);
 
-  // TODO: ~!
+  // TODO: ~! Fix ellipse size (now it stretches along w/ the plot axes).
   QCPItemEllipse* const ellipse (new QCPItemEllipse (customPlot));
   ellipse->topLeft->setType (QCPItemPosition::ptPlotCoords);
   ellipse->topLeft->setCoords (maxKey - .0075, .0075);

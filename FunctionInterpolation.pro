@@ -18,8 +18,8 @@ QMAKE_CXX = ccache g++
 
 CONFIG(release, debug|release) {
   message("Building `release' target")
-  QMAKE_CXXFLAGS_RELEASE += -O3 -mtune=generic
-#  QMAKE_CXXFLAGS_RELEASE += -O2 -mtune=native
+  QMAKE_CXXFLAGS_RELEASE += -O2 -mtune=generic
+#  QMAKE_CXXFLAGS_RELEASE += -O3 -mtune=native
 }
 
 CONFIG(debug, debug|release) {
@@ -40,7 +40,8 @@ equals(QT_ARCH, x86_64) {
 QMAKE_CXXFLAGS += \
   -msse -msse2 -mfpmath=sse \
   -mieee-fp -mno-fancy-math-387 -malign-double \
-  -ffp-contract=off -ffloat-store -frounding-math -fsignaling-nans
+  -ffp-contract=off -ffloat-store -frounding-math -fsignaling-nans \
+  -fext-numeric-literals
 
 QMAKE_CXXFLAGS_WARN_ON += \
   -fdiagnostics-color=auto \
@@ -50,11 +51,15 @@ QMAKE_EXT_CPP += cxx
 
 QMAKE_EXT_H += hxx
 
-#DEFINES += \
-#  QCUSTOMPLOT_CHECK_DATA
+DEFINES += \
+#  QCUSTOMPLOT_CHECK_DATA \
+  MULTIPRECISION_ENABLED
 
 INCLUDEPATH += \
   $$PWD/lib/qcustomplot
+
+LIBS += \
+  -lquadmath
 
 SOURCES += \
   lib/qcustomplot/qcustomplot/qcustomplot.cpp \
@@ -71,6 +76,6 @@ HEADERS += \
   src/math/functions.hxx \
   src/math/mathutils.hxx \
   src/math/newtonpolynomial.hxx \
-    src/math/numerictypes.hxx
+  src/math/numerictypes.hxx
 
 FORMS += forms/mainwindow.ui

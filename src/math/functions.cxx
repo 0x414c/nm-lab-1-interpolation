@@ -4,20 +4,23 @@
 
 #include <functional>
 
+#include "numerictypes.hxx"
+
 
 namespace Math
 {
   using std::cos;
   using std::function;
+  using std::pow;
   using std::sin;
-  using std::tan;
+//  using std::tan;
 
 
-  double
+  Float
   f (
-    double x,
-    double alpha, double beta, double gamma,
-    double delta, double epsilon, double mu
+    Float x,
+    Float alpha, Float beta, Float gamma,
+    Float delta, Float epsilon, Float mu
   )
   {
 //    return 2. * cos (x);
@@ -29,14 +32,14 @@ namespace Math
 //    );
 
     return (
-      alpha * sin (beta / pow (x - gamma, 2.)) +
-      delta * cos (epsilon / pow (x - mu, 2.))
+      alpha * sin (beta / pow (x - gamma, 2)) +
+      delta * cos (epsilon / pow (x - mu, 2))
     );
   }
 
 
-  double
-  d (const function<double (double)>& func, double x, double delta)
+  Float
+  d (const function<Float (Float)>& func, Float x, Float delta)
   {
     return (
       (func (x + delta) - func (x)) / delta
@@ -44,10 +47,10 @@ namespace Math
   }
 
 
-  double
+  Float
   r_n (
-    const function<double (double)>& f, const function<double (double)>& P_n,
-    double x, double t
+    const function<Float (Float)>& f, const function<Float (Float)>& P_n,
+    Float x, Float t
   )
   {
     return (

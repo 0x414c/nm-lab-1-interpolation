@@ -2,24 +2,40 @@
 #define MATHUTILS_HXX
 
 
+#include "numerictypes.hxx"
+
+
 namespace Math
 {
-  double lerp (double x1, double y1, double x2, double y2, double x0);
+  Float lerp (Float x1, Float y1, Float x2, Float y2, Float x0);
 
-  double clamp (double a, double b, double x);
+  Float clamp (Float a, Float b, Float x);
 
-  unsigned long long fac_i (unsigned long long n);
-  double fac_i (double n);
+  DoubleFloat absoluteValue (DoubleFloat x);
+#ifdef MULTIPRECISION_ENABLED
+  QuadFloat absoluteValue (QuadFloat x);
+#endif // MULTIPRECISION_ENABLED
 
-  unsigned long long ffac_i (unsigned long long t, unsigned long long k);
-  double ffac_i (double t, double k);
+  bool isAlmostEqual (Float x, Float y);
 
-  unsigned long long ffac_i_i (unsigned long long t, unsigned long long k);
-  double ffac_i_i (double t, double k);
+  UInteger factorial_i (UInteger n);
+  Float factorial_i (Float n);
 
-  double fac_g (double n);
+  UInteger fallingFactorial_i (UInteger t, UInteger k);
+  Float fallingFactorial_i (Float t, Float k);
 
-  double ffac_g (double t, double k);
+  UInteger fallingGactorial_i_i (UInteger t, UInteger k);
+  Float fallingGactorial_i_i (Float t, Float k);
+
+  DoubleFloat factorial_g (DoubleFloat n);
+#ifdef MULTIPRECISION_ENABLED
+  QuadFloat factorial_g (QuadFloat n);
+#endif // MULTIPRECISION_ENABLED
+
+  DoubleFloat fallingFactorial_g (DoubleFloat t, DoubleFloat k);
+#ifdef MULTIPRECISION_ENABLED
+  QuadFloat fallingFactorial_g (QuadFloat t, QuadFloat k);
+#endif // MULTIPRECISION_ENABLED
 }
 
 

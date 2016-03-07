@@ -1,15 +1,8 @@
 ﻿#ifndef MAINWINDOW_HXX
 #define MAINWINDOW_HXX
 
+
 #include <functional>
-
-//#include <QtGlobal>
-
-//#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-//#include <QtWidgets/QMainWindow>
-//#else
-//#include <QtGui/QMainWindow>
-//#endif
 
 #include <QColor>
 #include <QMainWindow>
@@ -21,6 +14,7 @@
 #include "qcustomplot/qcustomplot.h"
 
 #include "../math/functions.hxx"
+#include "../math/numerictypes.hxx"
 
 
 namespace Ui
@@ -117,13 +111,13 @@ class MainWindow :
     void updateCustomPlot (QCustomPlot* const customPlot);
 
     void plotFunction (
-      const std::function<double (double)>& f, int samplesCount,
+      const std::function<Math::Float (Math::Float)>& f, int samplesCount,
       double keyStart, double keyEnd, double valueStart, double valueEnd,
       const QColor& color, QCustomPlot* const customPlot, const QString& name
     );
 
     void plotPolynomial (
-      const std::function<double (double)>& f, int samplesCount, int stepsCount,
+      const std::function<Math::Float (Math::Float)>& f, int samplesCount, int stepsCount,
       double keyStart, double keyEnd, double valueStart, double valueEnd,
       const QColor& color, QCustomPlot* const customPlot, const QString& name
     );
@@ -134,7 +128,7 @@ class MainWindow :
     );
 
     void plotMax (
-      const std::function<double (double)>& func, int samplesCount,
+      const std::function<Math::Float (Math::Float)>& func, int samplesCount,
       double keyStart, double keyEnd,
       const QColor& color, QCustomPlot* const customPlot
     );

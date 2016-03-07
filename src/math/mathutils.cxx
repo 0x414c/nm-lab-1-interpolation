@@ -1,50 +1,69 @@
-﻿#include "mathutils.hxx"
-
-#include <cmath>
+﻿#include <cmath>
 
 #include <algorithm>
+#include <iostream>
+#include <limits>
 
-#include <QDebug>
+#ifdef MULTIPRECISION_ENABLED
+#include <boost/cstdfloat.hpp>
+#include <boost/math/special_functions.hpp>
+#endif // MULTIPRECISION_ENABLED
+
+#include "../config.hxx"
+#include "mathutils.hxx"
+#include "numerictypes.hxx"
 
 
 namespace Math
 {
-  /* double lerp (double a, double b, float w)
-  {
-    return (a + w * (b - a));
-  }  */
-  /* double lerp (double v0, double v1, double t)
-  {
-    return ((1. - t) * v0 + t * v1);
-  } */
-  double
-  lerp (double x1, double y1, double x2, double y2, double x0)
+  Float
+  lerp (Float x1, Float y1, Float x2, Float y2, Float x0)
   {
     return (y1 + (y2 - y1) * ((x0 - x1) / (x2 - x1)));
   }
 
 
-  /* double clamp (double x, double a, double b)
-  {
-    return max (a, min (b, x));
-  } */
-  /* double saturate (double x)
-  {
-    return max (0., min (1., x));
-  } */
-  double
-  clamp (double a, double b, double x)
+  Float
+  clamp (Float a, Float b, Float x)
   {
     return std::max (a, std::min (b, x));
   }
 
 
-  unsigned long long
-  fac_i (unsigned long long n)
+  DoubleFloat
+  absoluteValue (DoubleFloat x)
   {
-    unsigned long long acc (1);
+    return std::abs (x);
+  }
 
-    for (unsigned long long k (2); k <= n; ++k)
+
+#ifdef MULTIPRECISION_ENABLED
+  QuadFloat
+  absoluteValue (QuadFloat x)
+  {
+    return boost::multiprecision::abs (x);
+//    return std::fabs (x); // Doesn't work (but should be according to docs)
+  }
+#endif // MULTIPRECISION_ENABLED
+
+
+  bool
+  isAlmostEqual (Float x, Float y)
+  {
+    return (
+      absoluteValue (x - y) <=
+      Config::MathConstants::FuzzyComparisonEpsilon *
+      std::max<Float> ({Float (1), absoluteValue (x), absoluteValue (y)})
+    );
+  }
+
+
+  UInteger
+  factorial_i (UInteger n)
+  {
+    UInteger acc (1);
+
+    for (UInteger k (2); k <= n; ++k)
     {
       acc *= k;
     }
@@ -53,12 +72,12 @@ namespace Math
   }
 
 
-  double
-  fac_i (double n)
+  Float
+  factorial_i (Float n)
   {
-    double acc (1.);
+    Float acc (1);
 
-    for (double k (2.); k <= n; ++k)
+    for (Float k (2); k <= n; ++k)
     {
       acc *= k;
     }
@@ -67,86 +86,114 @@ namespace Math
   }
 
 
-  unsigned long long
-  ffac_i (unsigned long long n, unsigned long long k)
+  UInteger
+  fallingFactorial_i (UInteger n, UInteger k)
   {
-//    if (n < k)
-//    {
-//      return 0;
-//    }
-//    else
+    return (factorial_i (n) / factorial_i (n - k));
+  }
+
+
+  Float
+  fallingFactorial_i (Float n, Float k)
+  {
+    return (factorial_i (n) / factorial_i (n - k));
+  }
+
+
+  UInteger
+  fallingGactorial_i_i (UInteger n, UInteger k)
+  {
+    UInteger acc (1);
+
+    for (UInteger i (0); i < k; ++i)
     {
-      return (fac_i (n) / fac_i (n - k));
+      acc *= n - i;
+    }
+
+    return acc;
+  }
+
+
+  Float
+  fallingGactorial_i_i (Float n, Float k)
+  {
+    Float acc (1);
+
+    for (Float i (0); i < k; ++i)
+    {
+      acc *= n - i;
+    }
+
+    return acc;
+  }
+
+
+  DoubleFloat
+  factorial_g (DoubleFloat n)
+  {
+    const DoubleFloat ret (std::tgamma (n + 1));
+
+    //NOTE: This is added to unify std::tgamma and boost::tgamma return values.
+    if (std::isnan (ret) || std::isinf (ret))
+    {
+      return std::numeric_limits<DoubleFloat>::infinity ();
+    }
+    else
+    {
+      return ret;
     }
   }
 
 
-  double
-  ffac_i (double n, double k)
+#ifdef MULTIPRECISION_ENABLED
+  QuadFloat
+  factorial_g (QuadFloat n)
   {
-//    if (n < k)
-//    {
-//      return 0.;
-//    }
-//    else
+    using boost::math::policies::make_policy;
+    using boost::math::policies::errno_on_error;
+    using boost::math::policies::domain_error;
+    using boost::math::policies::evaluation_error;
+    using boost::math::policies::overflow_error;
+    using boost::math::policies::pole_error;
+
+
+    //NOTE: This is added to unify std::tgamma and boost::tgamma return values.
+    const QuadFloat ret (
+      boost::math::tgamma (
+        n + 1,
+        make_policy (
+          domain_error<errno_on_error> (),
+          pole_error<errno_on_error> (),
+          overflow_error<errno_on_error> (),
+          evaluation_error<errno_on_error> ()
+        )
+      )
+    );
+
+    if (boost::math::isnan (ret) || boost::math::isinf (ret))
     {
-      return (fac_i (n) / fac_i (n - k));
+      return std::numeric_limits<QuadFloat>::infinity ();
+    }
+    else
+    {
+      return ret;
     }
   }
+#endif // MULTIPRECISION_ENABLED
 
 
-  unsigned long long
-  ffac_i_i (unsigned long long n, unsigned long long k)
+  DoubleFloat
+  fallingFactorial_g (DoubleFloat n, DoubleFloat k)
   {
-//    if (n < k)
-//    {
-//      return 0;
-//    }
-//    else
-    {
-      unsigned long long acc (1);
-
-      for (unsigned long long i (0); i < k; ++i)
-      {
-        acc *= n - i;
-      }
-
-      return acc;
-    }
+    return (factorial_g (n) / factorial_g (n - k));
   }
 
 
-  double
-  ffac_i_i (double n, double k)
+#ifdef MULTIPRECISION_ENABLED
+  QuadFloat
+  fallingFactorial_g (QuadFloat n, QuadFloat k)
   {
-//    if (n < double (k))
-//    {
-//      return 0.;
-//    }
-//    else
-    {
-      double acc (1.);
-
-      for (double i (0.); i < k; ++i)
-      {
-        acc *= n - i;
-      }
-
-      return acc;
-    }
+    return (factorial_g (n) / factorial_g (n - k));
   }
-
-
-  double
-  fac_g (double n)
-  {
-    return std::tgamma (n + 1.);
-  }
-
-
-  double
-  ffac_g (double n, double k)
-  {
-    return (fac_g (n) / fac_g (n - k));
-  }
+#endif // MULTIPRECISION_ENABLED
 }

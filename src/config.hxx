@@ -2,6 +2,9 @@
 #define CONFIG_HXX
 
 
+#include "math/numerictypes.hxx"
+
+
 namespace Config
 {
   namespace GUI
@@ -42,6 +45,12 @@ namespace Config
 
       constexpr int FontSize = 9;
     }
+  }
+
+
+  namespace MathConstants
+  {
+    constexpr Math::Float FuzzyComparisonEpsilon = 1E-9;
   }
 }
 
