@@ -13,7 +13,6 @@ namespace Math
   using std::function;
   using std::pow;
   using std::sin;
-//  using std::tan;
 
 
   Float
@@ -23,14 +22,6 @@ namespace Math
     Float delta, Float epsilon, Float mu
   )
   {
-//    return 2. * cos (x);
-
-//    return 2. * sin (x);
-
-//    return (
-//      alpha * (sin (tan (beta / (x - gamma)))) + delta * (cos (epsilon * x))
-//    );
-
     return (
       alpha * sin (beta / pow (x - gamma, 2)) +
       delta * cos (epsilon / pow (x - mu, 2))

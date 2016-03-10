@@ -30,34 +30,6 @@ namespace Math
   }
 
 
-  DoubleFloat
-  absoluteValue (DoubleFloat x)
-  {
-    return std::abs (x);
-  }
-
-
-#ifdef MULTIPRECISION_ENABLED
-  QuadFloat
-  absoluteValue (QuadFloat x)
-  {
-    return boost::multiprecision::abs (x);
-//    return std::fabs (x); // Doesn't work (but should be according to docs)
-  }
-#endif // MULTIPRECISION_ENABLED
-
-
-  bool
-  isAlmostEqual (Float x, Float y)
-  {
-    return (
-      absoluteValue (x - y) <=
-      Config::MathConstants::FuzzyComparisonEpsilon *
-      std::max<Float> ({Float (1), absoluteValue (x), absoluteValue (y)})
-    );
-  }
-
-
   UInteger
   factorial_i (UInteger n)
   {
@@ -101,7 +73,7 @@ namespace Math
 
 
   UInteger
-  fallingGactorial_i_i (UInteger n, UInteger k)
+  fallingFactorial_i_i (UInteger n, UInteger k)
   {
     UInteger acc (1);
 
@@ -115,7 +87,7 @@ namespace Math
 
 
   Float
-  fallingGactorial_i_i (Float n, Float k)
+  fallingFactorial_i_i (Float n, Float k)
   {
     Float acc (1);
 
@@ -133,7 +105,7 @@ namespace Math
   {
     const DoubleFloat ret (std::tgamma (n + 1));
 
-    //NOTE: This is added to unify std::tgamma and boost::tgamma return values.
+    //HACK: This is added to unify std::tgamma and boost::tgamma return values.
     if (std::isnan (ret) || std::isinf (ret))
     {
       return std::numeric_limits<DoubleFloat>::infinity ();
@@ -149,26 +121,23 @@ namespace Math
   QuadFloat
   factorial_g (QuadFloat n)
   {
-    using boost::math::policies::make_policy;
+    using boost::math::policies::policy;
     using boost::math::policies::errno_on_error;
     using boost::math::policies::domain_error;
     using boost::math::policies::evaluation_error;
     using boost::math::policies::overflow_error;
     using boost::math::policies::pole_error;
 
+    using errnoPolicy = policy<
+      domain_error<errno_on_error>,
+      pole_error<errno_on_error>,
+      overflow_error<errno_on_error>,
+      evaluation_error<errno_on_error>
+    >;
 
-    //NOTE: This is added to unify std::tgamma and boost::tgamma return values.
-    const QuadFloat ret (
-      boost::math::tgamma (
-        n + 1,
-        make_policy (
-          domain_error<errno_on_error> (),
-          pole_error<errno_on_error> (),
-          overflow_error<errno_on_error> (),
-          evaluation_error<errno_on_error> ()
-        )
-      )
-    );
+
+    //HACK: This is added to unify std::tgamma and boost::tgamma return values.
+    const QuadFloat ret (boost::math::tgamma (n + 1, errnoPolicy ()));
 
     if (boost::math::isnan (ret) || boost::math::isinf (ret))
     {

@@ -11,21 +11,14 @@ namespace Math
 
   Float clamp (Float a, Float b, Float x);
 
-  DoubleFloat absoluteValue (DoubleFloat x);
-#ifdef MULTIPRECISION_ENABLED
-  QuadFloat absoluteValue (QuadFloat x);
-#endif // MULTIPRECISION_ENABLED
-
-  bool isAlmostEqual (Float x, Float y);
-
   UInteger factorial_i (UInteger n);
   Float factorial_i (Float n);
 
   UInteger fallingFactorial_i (UInteger t, UInteger k);
   Float fallingFactorial_i (Float t, Float k);
 
-  UInteger fallingGactorial_i_i (UInteger t, UInteger k);
-  Float fallingGactorial_i_i (Float t, Float k);
+  UInteger fallingFactorial_i_i (UInteger t, UInteger k);
+  Float fallingFactorial_i_i (Float t, Float k);
 
   DoubleFloat factorial_g (DoubleFloat n);
 #ifdef MULTIPRECISION_ENABLED

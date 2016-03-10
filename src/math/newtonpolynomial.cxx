@@ -91,6 +91,8 @@ namespace Math
     {
       acc += fallingFactorial_g (t, Float (k)) / factorial_g (Float (k)) *
              finDiffs_[k][0];
+//      acc += fallingFactorial_i_i (t, Float (k)) / factorial_i (Float (k)) *
+//             finDiffs_[k][0];
     }
 
     return acc;
