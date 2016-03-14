@@ -91,7 +91,7 @@ class MainWindow :
     double prop_x_0_ = 0.;
     double prop_delta_ = 0.;
 
-    Math::FunctionType functionType_ = Math::FunctionType::_;
+    Math::FunctionType functionType_ = Math::FunctionType::None;
 
     void enableFunctionType (
       Math::FunctionType functionType, bool enabled = true
@@ -105,32 +105,32 @@ class MainWindow :
 
     void setDirty (bool isDirty = true);
 
-    void initCustomPlot (QCustomPlot* const customPlot);
-    void enableCustomPlot (QCustomPlot* const customPlot, bool enabled = true);
-    void clearCustomPlot (QCustomPlot* const customPlot);
-    void updateCustomPlot (QCustomPlot* const customPlot);
+    void initCustomPlot (QCustomPlot* customPlot);
+    void enableCustomPlot (QCustomPlot* customPlot, bool enabled = true);
+    void clearCustomPlot (QCustomPlot* customPlot);
+    void updateCustomPlot (QCustomPlot* customPlot);
 
     void plotFunction (
       const std::function<Math::Float (Math::Float)>& f, int samplesCount,
       double keyStart, double keyEnd, double valueStart, double valueEnd,
-      const QColor& color, QCustomPlot* const customPlot, const QString& name
+      const QColor& color, QCustomPlot* customPlot, const QString& name
     );
 
     void plotPolynomial (
       const std::function<Math::Float (Math::Float)>& f, int samplesCount, int stepsCount,
       double keyStart, double keyEnd, double valueStart, double valueEnd,
-      const QColor& color, QCustomPlot* const customPlot, const QString& name
+      const QColor& color, QCustomPlot* customPlot, const QString& name
     );
 
     void plotBoundingBox (
       double keyStart, double keyEnd, double valueStart, double valueEnd,
-      const QColor& color, QCustomPlot* const customPlot
+      const QColor& color, QCustomPlot* customPlot
     );
 
     void plotMax (
       const std::function<Math::Float (Math::Float)>& func, int samplesCount,
       double keyStart, double keyEnd,
-      const QColor& color, QCustomPlot* const customPlot
+      const QColor& color, QCustomPlot* customPlot
     );
 };
 

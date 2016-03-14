@@ -120,7 +120,7 @@ MainWindow::on_funcParam_mu_DoubleSpinBox_valueChanged (double arg1)
 void
 MainWindow::on_plotParam_A_DoubleSpinBox_valueChanged (double arg1)
 {
-  using namespace Config::GUI::Limits;
+  using namespace Config::GUI::InputLimits;
 
 
   if (arg1 >= ABCD_Min && arg1 <= ABCD_Max)
@@ -142,7 +142,7 @@ MainWindow::on_plotParam_A_DoubleSpinBox_valueChanged (double arg1)
 void
 MainWindow::on_plotParam_B_DoubleSpinBox_valueChanged (double arg1)
 {
-  using namespace Config::GUI::Limits;
+  using namespace Config::GUI::InputLimits;
 
 
   if (arg1 >= ABCD_Min && arg1 <= ABCD_Max)
@@ -164,7 +164,7 @@ MainWindow::on_plotParam_B_DoubleSpinBox_valueChanged (double arg1)
 void
 MainWindow::on_plotParam_C_DoubleSpinBox_valueChanged (double arg1)
 {
-  using namespace Config::GUI::Limits;
+  using namespace Config::GUI::InputLimits;
 
 
   if (arg1 >= ABCD_Min && arg1 <= ABCD_Max)
@@ -186,7 +186,7 @@ MainWindow::on_plotParam_C_DoubleSpinBox_valueChanged (double arg1)
 void
 MainWindow::on_plotParam_D_DoubleSpinBox_valueChanged (double arg1)
 {
-  using namespace Config::GUI::Limits;
+  using namespace Config::GUI::InputLimits;
 
 
   if (arg1 >= ABCD_Min && arg1 <= ABCD_Max)
@@ -590,10 +590,10 @@ MainWindow::setDefaults (void)
   ui_->interpParam_delta_SpinBox->setValue (DeltaExponent);
 
   ui_->funcList_f_CheckBox->setChecked (true);
-//  ui_->funcList_d_f_CheckBox->setChecked (true);
   ui_->funcList_P_n_CheckBox->setChecked (true);
+//  ui_->funcList_r_n_CheckBox->setChecked (true);
+//  ui_->funcList_d_f_CheckBox->setChecked (true);
 //  ui_->funcList_d_P_n_CheckBox->setChecked (true);
-  ui_->funcList_r_n_CheckBox->setChecked (true);
 
   ui_->ctrl_liveUpdate_CheckBox->setChecked (LiveUpdateEnabled);
 }
@@ -608,14 +608,14 @@ MainWindow::setDirty (bool isDirty)
 
   if (isDirty_ && liveUpdateEnabled_)
   {
-    // TODO: ~! Update only parts of the plot that were modified.
+    // TODO: [~~] Update only parts of the plot that were modified.
     updateCustomPlot (ui_->plot_functions_CustomPlot);
   }
 }
 
 
 void
-MainWindow::initCustomPlot (QCustomPlot* const customPlot)
+MainWindow::initCustomPlot (QCustomPlot* customPlot)
 {
   using namespace Config::GUI::PlotParams;
 
@@ -704,7 +704,7 @@ MainWindow::initCustomPlot (QCustomPlot* const customPlot)
 
 
 void
-MainWindow::enableCustomPlot (QCustomPlot* const customPlot, bool enabled)
+MainWindow::enableCustomPlot (QCustomPlot* customPlot, bool enabled)
 {
   if (enabled)
   {
@@ -720,7 +720,7 @@ MainWindow::enableCustomPlot (QCustomPlot* const customPlot, bool enabled)
 
 
 void
-MainWindow::clearCustomPlot (QCustomPlot* const customPlot)
+MainWindow::clearCustomPlot (QCustomPlot* customPlot)
 {
   customPlot->clearFocus ();
   customPlot->clearGraphs ();
@@ -738,7 +738,7 @@ MainWindow::clearCustomPlot (QCustomPlot* const customPlot)
 
 
 void
-MainWindow::updateCustomPlot (QCustomPlot* const customPlot)
+MainWindow::updateCustomPlot (QCustomPlot* customPlot)
 {
   using namespace Config::GUI::PlotParams;
   using std::function;
@@ -754,7 +754,7 @@ MainWindow::updateCustomPlot (QCustomPlot* const customPlot)
 
   const int samplesCount (
     std::round (
-      double (PlotResolution) * (wndParam_B_ - wndParam_A_) + 1.
+      double (Resolution) * (wndParam_B_ - wndParam_A_) + 1.
     )
   );
 
@@ -852,8 +852,8 @@ MainWindow::updateCustomPlot (QCustomPlot* const customPlot)
 
   customPlot->rescaleAxes (true);
 
-  customPlot->xAxis->setRange (wndParam_A_ - .5, wndParam_B_ + .5);
-  customPlot->yAxis->setRange (wndParam_C_ - .5, wndParam_D_ + .5);
+  customPlot->xAxis->setRange (wndParam_A_ - Margin, wndParam_B_ + Margin);
+  customPlot->yAxis->setRange (wndParam_C_ - Margin, wndParam_D_ + Margin);
 
   customPlot->replot ();
 }
@@ -863,7 +863,7 @@ void
 MainWindow::plotFunction (
   const std::function<Math::Float (Math::Float)>& func, int samplesCount,
   double keyStart, double keyEnd, double valueStart, double valueEnd,
-  const QColor& color, QCustomPlot* const customPlot, const QString& name
+  const QColor& color, QCustomPlot* customPlot, const QString& name
 )
 {
   QVector<double> keys (samplesCount), values (samplesCount);
@@ -881,6 +881,7 @@ MainWindow::plotFunction (
 
     keys[sampleIdx] = key;
 
+    // FIXME: [~-]
     if (std::isnan (value))
     {
       values[sampleIdx] = std::numeric_limits<double>::quiet_NaN ();
@@ -908,7 +909,7 @@ void
 MainWindow::plotPolynomial (
   const std::function<Math::Float (Math::Float)>& func, int samplesCount, int stepsCount,
   double keyStart, double keyEnd, double valueStart, double valueEnd,
-  const QColor& color, QCustomPlot* const customPlot, const QString& name
+  const QColor& color, QCustomPlot* customPlot, const QString& name
 )
 {
   QVector<double> keys (samplesCount), values (samplesCount);
@@ -935,6 +936,7 @@ MainWindow::plotPolynomial (
 
     keys[sampleIdx] = key;
 
+    // FIXME: [~-]
     if (std::isnan (value))
     {
       values[sampleIdx] = std::numeric_limits<double>::quiet_NaN ();
@@ -961,7 +963,7 @@ MainWindow::plotPolynomial (
 void
 MainWindow::plotBoundingBox (
   double keyStart, double keyEnd, double valueStart, double valueEnd,
-  const QColor& color, QCustomPlot* const customPlot
+  const QColor& color, QCustomPlot* customPlot
 )
 {
   QCPItemStraightLine* const top (new QCPItemStraightLine (customPlot));
@@ -1002,7 +1004,7 @@ void
 MainWindow::plotMax (
   const std::function<Math::Float (Math::Float)>& func, int samplesCount,
   double keyStart, double keyEnd, const QColor& color,
-  QCustomPlot* const customPlot
+  QCustomPlot* customPlot
 )
 {
   double maxKey (0), maxValue (0);
@@ -1035,12 +1037,13 @@ MainWindow::plotMax (
   line->setSelectable (true);
   customPlot->addItem (line);
 
-  // TODO: ~! Fix ellipse size (now it stretches along w/ the plot axes).
+  // TODO: [~+] Fix ellipse size (it stretches along w/ the plot axes).
   QCPItemEllipse* const ellipse (new QCPItemEllipse (customPlot));
   ellipse->topLeft->setType (QCPItemPosition::ptPlotCoords);
   ellipse->topLeft->setCoords (maxKey - .0075, .0075);
   ellipse->bottomRight->setType (QCPItemPosition::ptPlotCoords);
   ellipse->bottomRight->setCoords (maxKey + .0075, -.0075);
+  // TODO: [~-] Do not use solid fill.
   ellipse->setPen (QPen (Qt::magenta));
   ellipse->setSelectedPen (
     QPen (QBrush (Qt::magenta), Config::GUI::PlotParams::SelectedPenWidth)

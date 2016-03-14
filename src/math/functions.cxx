@@ -32,9 +32,7 @@ namespace Math
   Float
   d (const function<Float (Float)>& func, Float x, Float delta)
   {
-    return (
-      (func (x + delta) - func (x)) / delta
-    );
+    return ((func (x + delta) - func (x)) / delta);
   }
 
 
@@ -44,8 +42,6 @@ namespace Math
     Float x, Float t
   )
   {
-    return (
-      f (x) - P_n (t)
-    );
+    return (f (x) - P_n (t));
   }
 }

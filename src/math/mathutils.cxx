@@ -4,10 +4,10 @@
 #include <iostream>
 #include <limits>
 
-#ifdef MULTIPRECISION_ENABLED
+#ifdef QUAD_PRECISION_ENABLED
 #include <boost/cstdfloat.hpp>
 #include <boost/math/special_functions.hpp>
-#endif // MULTIPRECISION_ENABLED
+#endif // QUAD_PRECISION_ENABLED
 
 #include "../config.hxx"
 #include "mathutils.hxx"
@@ -33,28 +33,28 @@ namespace Math
   UInteger
   factorial_i (UInteger n)
   {
-    UInteger acc (1);
+    UInteger prod (1);
 
-    for (UInteger k (2); k <= n; ++k)
+    for (UInteger i (2); i <= n; ++i)
     {
-      acc *= k;
+      prod *= i;
     }
 
-    return acc;
+    return prod;
   }
 
 
   Float
   factorial_i (Float n)
   {
-    Float acc (1);
+    Float prod (1);
 
-    for (Float k (2); k <= n; ++k)
+    for (Float i (2); i <= n; ++i)
     {
-      acc *= k;
+      prod *= i;
     }
 
-    return acc;
+    return prod;
   }
 
 
@@ -75,40 +75,41 @@ namespace Math
   UInteger
   fallingFactorial_i_i (UInteger n, UInteger k)
   {
-    UInteger acc (1);
+    UInteger prod (1);
 
     for (UInteger i (0); i < k; ++i)
     {
-      acc *= n - i;
+      prod *= n - i;
     }
 
-    return acc;
+    return prod;
   }
 
 
   Float
   fallingFactorial_i_i (Float n, Float k)
   {
-    Float acc (1);
+    Float prod (1);
 
     for (Float i (0); i < k; ++i)
     {
-      acc *= n - i;
+      prod *= n - i;
     }
 
-    return acc;
+    return prod;
   }
 
 
-  DoubleFloat
-  factorial_g (DoubleFloat n)
+  Float64
+  factorial_g (Float64 n)
   {
-    const DoubleFloat ret (std::tgamma (n + 1));
+    const Float64 ret (std::tgamma (n + 1));
 
-    //HACK: This is added to unify std::tgamma and boost::tgamma return values.
+    // HACK: Unifies std::tgamma and boost::tgamma return values
+    // due to strange bug in std::tgamma.
     if (std::isnan (ret) || std::isinf (ret))
     {
-      return std::numeric_limits<DoubleFloat>::infinity ();
+      return std::numeric_limits<Float64>::infinity ();
     }
     else
     {
@@ -117,9 +118,9 @@ namespace Math
   }
 
 
-#ifdef MULTIPRECISION_ENABLED
-  QuadFloat
-  factorial_g (QuadFloat n)
+#ifdef QUAD_PRECISION_ENABLED
+  Float128
+  factorial_g (Float128 n)
   {
     using boost::math::policies::policy;
     using boost::math::policies::errno_on_error;
@@ -136,33 +137,34 @@ namespace Math
     >;
 
 
-    //HACK: This is added to unify std::tgamma and boost::tgamma return values.
-    const QuadFloat ret (boost::math::tgamma (n + 1, errnoPolicy ()));
+    // HACK: This is added to unify std::tgamma and boost::tgamma return values
+    // due to strange bug in std::tgamma.
+    const Float128 ret (boost::math::tgamma (n + 1, errnoPolicy ()));
 
     if (boost::math::isnan (ret) || boost::math::isinf (ret))
     {
-      return std::numeric_limits<QuadFloat>::infinity ();
+      return std::numeric_limits<Float128>::infinity ();
     }
     else
     {
       return ret;
     }
   }
-#endif // MULTIPRECISION_ENABLED
+#endif // QUAD_PRECISION_ENABLED
 
 
-  DoubleFloat
-  fallingFactorial_g (DoubleFloat n, DoubleFloat k)
+  Float64
+  fallingFactorial_g (Float64 n, Float64 k)
   {
     return (factorial_g (n) / factorial_g (n - k));
   }
 
 
-#ifdef MULTIPRECISION_ENABLED
-  QuadFloat
-  fallingFactorial_g (QuadFloat n, QuadFloat k)
+#ifdef QUAD_PRECISION_ENABLED
+  Float128
+  fallingFactorial_g (Float128 n, Float128 k)
   {
     return (factorial_g (n) / factorial_g (n - k));
   }
-#endif // MULTIPRECISION_ENABLED
+#endif // QUAD_PRECISION_ENABLED
 }

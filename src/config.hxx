@@ -14,23 +14,23 @@ namespace Config
       constexpr double Alpha = 0.;
       constexpr double Beta = 0.;
       constexpr double Gamma = 0.;
-      constexpr double Delta = .25;
+      constexpr double Delta = .5;
       constexpr double Epsilon = .5;
       constexpr double Mu = 1.;
 
-      constexpr double A = -2.5;
-      constexpr double B = 2.5;
-      constexpr double C = -5.;
-      constexpr double D = 5.;
+      constexpr double A = -2.;
+      constexpr double B = 2.;
+      constexpr double C = -1.;
+      constexpr double D = 1.;
 
-      constexpr int N = 20;
+      constexpr int N = 10;
       constexpr int DeltaExponent = -4;
 
       constexpr bool LiveUpdateEnabled = false;
     }
 
 
-    namespace Limits
+    namespace InputLimits
     {
       constexpr double ABCD_Min = -100.;
       constexpr double ABCD_Max = 100.;
@@ -39,7 +39,9 @@ namespace Config
 
     namespace PlotParams
     {
-      constexpr int PlotResolution = 100;
+      constexpr int Resolution = 100;
+
+      constexpr double Margin = .25;
 
       constexpr double SelectedPenWidth = 2.;
 
@@ -50,7 +52,7 @@ namespace Config
 
   namespace MathConstants
   {
-    constexpr Math::Float FuzzyComparisonEpsilon = 1E-9;
+    constexpr double Epsilon = 1E-9;
   }
 }
 

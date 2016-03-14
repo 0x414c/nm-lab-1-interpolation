@@ -28,7 +28,9 @@ namespace Math
 
   enum struct FunctionType : int
   {
-    _ = 0, f = 1, P_n = 2, r_n = 4, d_f = 8, d_P_n = 16
+    None = 0,
+    f = (1 << 0), P_n = (1 << 1), r_n = (1 << 2), d_f = (1 << 3), d_P_n = (1 << 4),
+    All = f | P_n | r_n | d_f | d_P_n
   };
 }
 
