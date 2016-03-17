@@ -1007,7 +1007,7 @@ MainWindow::plotMax (
   QCustomPlot* customPlot
 )
 {
-  double maxKey (0), maxValue (0);
+  double maxKey (0), maxAbsValue (0);
 
   for (int sampleIdx (0); sampleIdx < samplesCount; ++sampleIdx)
   {
@@ -1020,9 +1020,9 @@ MainWindow::plotMax (
     );
     const double value (func (key));
 
-    if (std::abs (value) > std::abs (maxValue))
+    if (std::abs (value) > maxAbsValue)
     {
-      maxValue = value;
+      maxAbsValue = std::abs (value);
       maxKey = key;
     }
   }
@@ -1053,7 +1053,7 @@ MainWindow::plotMax (
   customPlot->addItem (ellipse);
 
   ui_->prop_x_0_LcdNumber->display (maxKey);
-  ui_->prop_delta_LcdNumber->display (maxValue);
+  ui_->prop_delta_LcdNumber->display (maxAbsValue);
 }
 
 #pragma endregion // private methods

@@ -39,7 +39,7 @@ equals(QT_ARCH, x86_64) {
 
 QMAKE_CXXFLAGS += \
   -msse -msse2 -mfpmath=sse \
-  -mieee-fp -mno-fancy-math-387 -malign-double \
+  -mieee-fp -mno-fancy-math-387 -malign-double -mpc80 \
   -ffp-contract=off -ffloat-store -frounding-math -fsignaling-nans \
   -fext-numeric-literals
 

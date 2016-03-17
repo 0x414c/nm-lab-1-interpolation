@@ -25,6 +25,9 @@ namespace Math
 
 
     private:
+      Float valueAt_g_n (Float t) const;
+      Float valueAt_p_k (Float t) const;
+
       std::vector<std::vector<Float>> finDiffs_;
 
       std::vector<Float> x_;

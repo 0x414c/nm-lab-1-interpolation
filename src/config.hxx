@@ -52,7 +52,7 @@ namespace Config
 
   namespace MathConstants
   {
-    constexpr double Epsilon = 1E-9;
+    constexpr double Epsilon = 1E-16;
   }
 }
 

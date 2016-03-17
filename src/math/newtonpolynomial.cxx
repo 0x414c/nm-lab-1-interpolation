@@ -2,7 +2,6 @@
 #include <cstddef>
 
 #include <functional>
-#include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <vector>
@@ -25,8 +24,6 @@ namespace Math
   ) throw (std::invalid_argument) :
     n_ (n)
   {
-//    std::clog << "x0=" << x_0 << "; x_n_1=" << x_n_1 << "; n=" << n << std::endl;
-
     if (n_ < 2)
     {
       throw std::invalid_argument ("`n_' should be greater than 1.");
@@ -47,8 +44,6 @@ namespace Math
     x_ = std::vector<Float> (n_);
 
     const Float h ((x_n_1 - x_0) / Float (n_ - 1));
-
-//    std::clog << "h=" << h << std::endl;
 
     for (size_t k (0); k < n_; ++k)
     {
@@ -76,8 +71,6 @@ namespace Math
       {
         finDiffs_[0][k] = y_k;
       }
-
-//      std::clog << "k=" << k << "; x=" << x_[k] << "; y=" << finDiffs_[0][k] << std::endl;
     }
 
     for (size_t i (1); i < n_; ++i)
@@ -85,8 +78,6 @@ namespace Math
       for (size_t j (0); j < n_ - i; ++j)
       {
         finDiffs_[i][j] = finDiffs_[i - 1][j + 1] - finDiffs_[i - 1][j];
-
-//        std::clog << "i=" << i << "; j=" << j << "; y=" << finDiffs_[i][j] << std::endl;
       }
     }
   }
@@ -95,28 +86,36 @@ namespace Math
   Float
   NewtonPolynomial::operator () (Float t) const
   {
+//    return valueAt_g_n (t);
+    return valueAt_p_k (t);
+  }
+
+
+  Float
+  NewtonPolynomial::valueAt_g_n (Float t) const
+  {
     Float sum (0);
 
-    // Var. 1: naive summation
-//    for (size_t k (0); k < n_; ++k)
-//    {
-//      // Var. 1: Factorial w/ Gamma function, falling factorial w/ division
-//      // Overflow at k = 173 w/ Float64
-////      sum += fallingFactorial_g (t, Float (k)) / factorial_g (Float (k)) *
-////             finDiffs_[k][0];
+    // Var. #1: naïve summation
+    for (size_t k (0); k < n_; ++k)
+    {
+      // Var. #1: Factorial via Gamma function, falling factorial via division
+      // Overflow at k = 173 w/ Float64
+      sum += fallingFactorial_g (t, Float (k)) / factorial_g (Float (k)) *
+             finDiffs_[k][0];
 
-//      // Var 2: Factorials w/ iterative multiplication
-//      // Overflow at k = 173 w/ Float64
-////      sum += fallingFactorial_i_i (t, Float (k)) / factorial_i (Float (k)) *
-////             finDiffs_[k][0];
+      // Var #2: Factorials via iterative multiplication
+      // Overflow at k = 173 w/ Float64
+//      sum += fallingFactorial_i_i (t, Float (k)) / factorial_i (Float (k)) *
+//             finDiffs_[k][0];
 
-//      // Var. 3: Factorial w/ iterative multiplication,
-//      // falling factorial w/ division
-//      // Overflow at k = 173 w/ Float64
-////      sum += fallingFactorial_i (t, Float (k)) / factorial_i (Float (k)) *
-////             finDiffs_[k][0];
+      // Var. #3: Factorial via iterative multiplication,
+      // falling factorial via division
+      // Overflow at k = 173 w/ Float64
+//      sum += fallingFactorial_i (t, Float (k)) / factorial_i (Float (k)) *
+//             finDiffs_[k][0];
 
-//      // Var. 3: Pairwise division
+      // Var. #4: Pairwise-like division
 //      {
 //        Float prod (1);
 
@@ -127,55 +126,35 @@ namespace Math
 
 //        sum += prod * finDiffs_[k][0];
 //      }
-//    }
-
-    // Var. 2: Kahan summation (aka compensated summation)
-//    {
-//      Float err (0);
-
-//      for (size_t k (0); k < n_; ++k)
-//      {
-//        // Var. 4: Pairwise division
-//        Float prod (1);
-
-//        for (size_t i (0); i < k; ++i)
-//        {
-//          prod *= (t - Float (i)) / (Float (k) - Float (i));
-//        }
-
-//        prod *= finDiffs_[k][0];
-
-//        const Float temp (sum);
-//        const Float y (prod + err);
-//        sum = temp + y; // sum = sum + prod
-//        err = (temp - sum) + y;
-//      }
-//    }
-
-    // Var. 2: Kahan summation (aka compensated summation)
-    {
-      Float correction (0);
-
-      for (size_t k (0); k < n_; ++k)
-      {
-        // Var. 4: Pairwise division
-        Float prod (1);
-
-        for (size_t i (0); i < k; ++i)
-        {
-          prod *= (t - Float (i)) / (Float (k) - Float (i));
-        }
-
-        prod *= finDiffs_[k][0];
-
-        const Float correctedNextTerm (prod - correction);
-        const Float newSum (sum + correctedNextTerm);
-        correction = (newSum - sum) - correctedNextTerm;
-        sum = newSum;
-      }
     }
 
-//    std::clog << "t=" << t << "; y=" << sum << std::endl;
+    return sum;
+  }
+
+
+  Float
+  NewtonPolynomial::valueAt_p_k (Float t) const
+  {
+    // Var. #2: Kahan summation (aka compensated summation)
+    Float sum (0), correction (0);
+
+    for (size_t k (0); k < n_; ++k)
+    {
+      // Var. #4: Pairwise-like division
+      Float prod (1);
+
+      for (size_t i (0); i < k; ++i)
+      {
+        prod *= (t - Float (i)) / (Float (k) - Float (i));
+      }
+
+      prod *= finDiffs_[k][0];
+
+      const Float correctedNextTerm (prod - correction);
+      const Float newSum (sum + correctedNextTerm);
+      correction = (newSum - sum) - correctedNextTerm;
+      sum = newSum;
+    }
 
     return sum;
   }
