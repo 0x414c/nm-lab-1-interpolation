@@ -51,9 +51,9 @@ QMAKE_EXT_CPP += cxx
 
 QMAKE_EXT_H += hxx
 
-DEFINES += \
-#  QCUSTOMPLOT_CHECK_DATA \
-  QUAD_PRECISION_ENABLED
+#DEFINES += \
+##  QCUSTOMPLOT_CHECK_DATA \
+#  QUAD_PRECISION_ENABLED
 
 INCLUDEPATH += \
   $$PWD/lib/qcustomplot
@@ -67,6 +67,7 @@ SOURCES += \
   src/main.cxx \
   src/math/functions.cxx \
   src/math/mathutils.cxx \
+  src/math/lagrangepolynomial.cxx \
   src/math/newtonpolynomial.cxx
 
 HEADERS += \
@@ -75,6 +76,7 @@ HEADERS += \
   src/gui/mainwindow.hxx \
   src/math/functions.hxx \
   src/math/mathutils.hxx \
+  src/math/lagrangepolynomial.hxx \
   src/math/newtonpolynomial.hxx \
   src/math/numerictypes.hxx
 

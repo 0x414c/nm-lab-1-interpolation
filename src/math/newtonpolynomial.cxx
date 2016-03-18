@@ -26,7 +26,7 @@ namespace Math
   {
     if (n_ < 2)
     {
-      throw std::invalid_argument ("`n_' should be greater than 1.");
+      throw std::invalid_argument ("`n' should be greater than 1.");
     }
 
     if (x_0 >= x_n_1)
@@ -59,8 +59,7 @@ namespace Math
       {
         using Config::MathConstants::Epsilon;
 
-        // FIXME: [+~] y := avg (f (x + eps), f (x - eps))
-//        finDiffs_[0][k] = 0;
+
         finDiffs_[0][k] = Math::lerp (
           x_[k] - Epsilon, func (x_[k] - Epsilon),
           x_[k] + Epsilon, func (x_[k] + Epsilon),

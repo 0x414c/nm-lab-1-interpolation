@@ -465,7 +465,7 @@
       <x>241</x>
       <y>58</y>
       <width>110</width>
-      <height>162</height>
+      <height>182</height>
      </rect>
     </property>
     <property name="autoFillBackground">
@@ -519,6 +519,13 @@
       <widget class="QCheckBox" name="funcList_d_P_n_CheckBox">
        <property name="text">
         <string>∂Pₙ(x)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="funcList_L_n_CheckBox">
+       <property name="text">
+        <string>Lₙ(x)</string>
        </property>
       </widget>
      </item>

@@ -1,9 +1,8 @@
-﻿#include "functions.hxx"
-
-#include <cmath>
+﻿#include <cmath>
 
 #include <functional>
 
+#include "functions.hxx"
 #include "numerictypes.hxx"
 
 

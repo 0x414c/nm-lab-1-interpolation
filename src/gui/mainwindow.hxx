@@ -65,7 +65,7 @@ class MainWindow :
     void on_funcList_r_n_CheckBox_toggled (bool checked);
     void on_funcList_d_f_CheckBox_toggled (bool checked);
     void on_funcList_d_P_n_CheckBox_toggled (bool checked);
-
+    void on_funcList_L_n_CheckBox_toggled (bool checked);
 
   private:
     Ui::MainWindow* ui_ = nullptr;
@@ -130,7 +130,7 @@ class MainWindow :
     void plotMax (
       const std::function<Math::Float (Math::Float)>& func, int samplesCount,
       double keyStart, double keyEnd,
-      const QColor& color, QCustomPlot* customPlot
+      const QColor& color, const QColor& pointColor, QCustomPlot* customPlot
     );
 };
 

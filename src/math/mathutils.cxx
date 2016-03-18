@@ -9,9 +9,9 @@
 #include <boost/math/special_functions.hpp>
 #endif // QUAD_PRECISION_ENABLED
 
-#include "../config.hxx"
 #include "mathutils.hxx"
 #include "numerictypes.hxx"
+#include "../config.hxx"
 
 
 namespace Math

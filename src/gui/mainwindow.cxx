@@ -24,6 +24,7 @@
 #include "../config.hxx"
 #include "../math/functions.hxx"
 #include "../math/mathutils.hxx"
+#include "../math/lagrangepolynomial.hxx"
 #include "../math/newtonpolynomial.hxx"
 #include "../math/numerictypes.hxx"
 
@@ -120,14 +121,14 @@ MainWindow::on_funcParam_mu_DoubleSpinBox_valueChanged (double arg1)
 void
 MainWindow::on_plotParam_A_DoubleSpinBox_valueChanged (double arg1)
 {
-  using namespace Config::GUI::InputLimits;
+  using namespace Config::Gui::InputLimits;
 
 
   if (arg1 >= ABCD_Min && arg1 <= ABCD_Max)
   {
     if (arg1 >= ui_->plotParam_B_DoubleSpinBox->value ())
     {
-      ui_->plotParam_B_DoubleSpinBox->setValue (arg1);
+      ui_->plotParam_B_DoubleSpinBox->setValue (arg1 + Step);
     }
 
     wndParam_A_ = arg1;
@@ -142,14 +143,14 @@ MainWindow::on_plotParam_A_DoubleSpinBox_valueChanged (double arg1)
 void
 MainWindow::on_plotParam_B_DoubleSpinBox_valueChanged (double arg1)
 {
-  using namespace Config::GUI::InputLimits;
+  using namespace Config::Gui::InputLimits;
 
 
   if (arg1 >= ABCD_Min && arg1 <= ABCD_Max)
   {
     if (arg1 <= ui_->plotParam_A_DoubleSpinBox->value ())
     {
-      ui_->plotParam_A_DoubleSpinBox->setValue (arg1);
+      ui_->plotParam_A_DoubleSpinBox->setValue (arg1 - Step);
     }
 
     wndParam_B_ = arg1;
@@ -164,14 +165,14 @@ MainWindow::on_plotParam_B_DoubleSpinBox_valueChanged (double arg1)
 void
 MainWindow::on_plotParam_C_DoubleSpinBox_valueChanged (double arg1)
 {
-  using namespace Config::GUI::InputLimits;
+  using namespace Config::Gui::InputLimits;
 
 
   if (arg1 >= ABCD_Min && arg1 <= ABCD_Max)
   {
     if (arg1 >= ui_->plotParam_D_DoubleSpinBox->value ())
     {
-      ui_->plotParam_D_DoubleSpinBox->setValue (arg1);
+      ui_->plotParam_D_DoubleSpinBox->setValue (arg1 + Step);
     }
 
     wndParam_C_ = arg1;
@@ -186,14 +187,14 @@ MainWindow::on_plotParam_C_DoubleSpinBox_valueChanged (double arg1)
 void
 MainWindow::on_plotParam_D_DoubleSpinBox_valueChanged (double arg1)
 {
-  using namespace Config::GUI::InputLimits;
+  using namespace Config::Gui::InputLimits;
 
 
   if (arg1 >= ABCD_Min && arg1 <= ABCD_Max)
   {
     if (arg1 <= ui_->plotParam_C_DoubleSpinBox->value ())
     {
-      ui_->plotParam_C_DoubleSpinBox->setValue (arg1);
+      ui_->plotParam_C_DoubleSpinBox->setValue (arg1 - Step);
     }
 
     wndParam_D_ = arg1;
@@ -416,6 +417,16 @@ MainWindow::on_funcList_d_P_n_CheckBox_toggled (bool checked)
   setDirty (true);
 }
 
+
+void
+MainWindow::on_funcList_L_n_CheckBox_toggled (bool checked)
+{
+  enableFunctionType (Math::FunctionType::L_n, checked);
+
+  setDirty (true);
+}
+
+
 #pragma endregion // private slots
 
 
@@ -565,13 +576,19 @@ MainWindow::initSignalsAndSlots (void)
     ui_->funcList_d_P_n_CheckBox, SIGNAL (toggled (bool)),
     this, SLOT (on_funcList_d_P_n_CheckBox_toggled (bool))
   );
+
+  connect (
+    ui_->funcList_L_n_CheckBox, SIGNAL (toggled (bool)),
+    this, SLOT (on_funcList_L_n_CheckBox_toggled (bool))
+  );
 }
 
 
 void
 MainWindow::setDefaults (void)
 {
-  using namespace Config::GUI::Defaults;
+  using namespace Config::Gui::Defaults;
+  using Config::Gui::InputLimits::Step;
 
 
   ui_->funcParam_alpha_DoubleSpinBox->setValue (Alpha);
@@ -582,9 +599,13 @@ MainWindow::setDefaults (void)
   ui_->funcParam_mu_DoubleSpinBox->setValue (Mu);
 
   ui_->plotParam_A_DoubleSpinBox->setValue (A);
+  ui_->plotParam_A_DoubleSpinBox->setSingleStep (Step);
   ui_->plotParam_B_DoubleSpinBox->setValue (B);
+  ui_->plotParam_B_DoubleSpinBox->setSingleStep (Step);
   ui_->plotParam_C_DoubleSpinBox->setValue (C);
+  ui_->plotParam_C_DoubleSpinBox->setSingleStep (Step);
   ui_->plotParam_D_DoubleSpinBox->setValue (D);
+  ui_->plotParam_D_DoubleSpinBox->setSingleStep (Step);
 
   ui_->interpParam_n_SpinBox->setValue (N);
   ui_->interpParam_delta_SpinBox->setValue (DeltaExponent);
@@ -594,6 +615,7 @@ MainWindow::setDefaults (void)
 //  ui_->funcList_r_n_CheckBox->setChecked (true);
 //  ui_->funcList_d_f_CheckBox->setChecked (true);
 //  ui_->funcList_d_P_n_CheckBox->setChecked (true);
+//  ui_->funcList_L_n_CheckBox->setChecked (true);
 
   ui_->ctrl_liveUpdate_CheckBox->setChecked (LiveUpdateEnabled);
 }
@@ -617,7 +639,7 @@ MainWindow::setDirty (bool isDirty)
 void
 MainWindow::initCustomPlot (QCustomPlot* customPlot)
 {
-  using namespace Config::GUI::PlotParams;
+  using namespace Config::Gui::PlotParams;
 
 
   const QFont normalFont (font ().family (), FontSize);
@@ -740,17 +762,13 @@ MainWindow::clearCustomPlot (QCustomPlot* customPlot)
 void
 MainWindow::updateCustomPlot (QCustomPlot* customPlot)
 {
-  using namespace Config::GUI::PlotParams;
+  using namespace Config::Gui::PlotParams;
+  using Config::Gui::Colors;
   using std::function;
   using std::placeholders::_1;
 
 
   qDebug () << "updateCustomPlot";
-
-  const QVector<QColor> colors {
-    Qt::blue, Qt::darkCyan, Qt::red, Qt::darkMagenta,
-    Qt::green, Qt::darkGreen, Qt::darkYellow
-  };
 
   const int samplesCount (
     std::round (
@@ -758,9 +776,6 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
     )
   );
 
-//  qDebug ()
-//    << "samplesCount ==" << samplesCount
-//    << "; width ==" << customPlot->axisRect ()->size ().width ();
 
   const function<Math::Float (Math::Float)> f (
     std::bind (
@@ -803,21 +818,18 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
     )
   );
 
+  const Math::LagrangePolynomial L_n (
+    f, wndParam_A_, wndParam_B_, interpParam_n_
+  );
+
+
   clearCustomPlot (customPlot);
 
   if (isFunctionTypeEnabled (Math::FunctionType::f))
   {
     plotFunction (
       f, samplesCount, wndParam_A_, wndParam_B_, wndParam_C_, wndParam_D_,
-      colors[0], customPlot, QStringLiteral ("f(x)")
-    );
-  }
-
-  if (isFunctionTypeEnabled (Math::FunctionType::d_f))
-  {
-    plotFunction (
-      d_f, samplesCount, wndParam_A_, wndParam_B_, wndParam_C_, wndParam_D_,
-      colors[1], customPlot, QStringLiteral ("∂f(x)")
+      Colors[QStringLiteral ("Indigo")], customPlot, QStringLiteral ("f(x)")
     );
   }
 
@@ -825,15 +837,8 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
   {
     plotPolynomial (
       P_n, samplesCount, interpParam_n_, wndParam_A_, wndParam_B_, wndParam_C_,
-      wndParam_D_, colors[2], customPlot, QStringLiteral ("Pₙ(x)")
-    );
-  }
-
-  if (isFunctionTypeEnabled (Math::FunctionType::d_P_n))
-  {
-    plotFunction (
-      d_P_n, samplesCount, wndParam_A_, wndParam_B_, wndParam_C_, wndParam_D_,
-      colors[3], customPlot, QStringLiteral ("∂Pₙ(x)")
+      wndParam_D_, Colors[QStringLiteral ("Red")],
+      customPlot, QStringLiteral ("Pₙ(x)")
     );
   }
 
@@ -841,7 +846,31 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
   {
     plotFunction (
       r_n, samplesCount, wndParam_A_, wndParam_B_, wndParam_C_, wndParam_D_,
-      colors[6], customPlot, QStringLiteral ("rₙ(x)")
+      Colors[QStringLiteral ("Amber")], customPlot, QStringLiteral ("rₙ(x)")
+    );
+  }
+
+  if (isFunctionTypeEnabled (Math::FunctionType::d_f))
+  {
+    plotFunction (
+      d_f, samplesCount, wndParam_A_, wndParam_B_, wndParam_C_, wndParam_D_,
+      Colors[QStringLiteral ("Blue")], customPlot, QStringLiteral ("∂f(x)")
+    );
+  }
+
+  if (isFunctionTypeEnabled (Math::FunctionType::d_P_n))
+  {
+    plotFunction (
+      d_P_n, samplesCount, wndParam_A_, wndParam_B_, wndParam_C_, wndParam_D_,
+      Colors[QStringLiteral ("Purple")], customPlot, QStringLiteral ("∂Pₙ(x)")
+    );
+  }
+
+  if (isFunctionTypeEnabled (Math::FunctionType::L_n))
+  {
+    plotFunction (
+      L_n, samplesCount, wndParam_A_, wndParam_B_, wndParam_C_, wndParam_D_,
+      Colors[QStringLiteral ("Teal")], customPlot, QStringLiteral ("Lₙ(x)")
     );
   }
 
@@ -850,7 +879,11 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
     Qt::darkGray, customPlot
   );
 
-  plotMax (r_n, samplesCount, wndParam_A_, wndParam_B_, colors[4], customPlot);
+  plotMax (
+    r_n, samplesCount, wndParam_A_, wndParam_B_,
+    Colors[QStringLiteral ("DeepOrange")], Colors[QStringLiteral ("Pink")],
+    customPlot
+  );
 
   customPlot->rescaleAxes (true);
 
@@ -898,7 +931,7 @@ MainWindow::plotFunction (
   graph->setData (keys, values);
   graph->setPen (QPen (color));
   graph->setSelectedPen (
-    QPen (QBrush (color), Config::GUI::PlotParams::SelectedPenWidth)
+    QPen (QBrush (color), Config::Gui::PlotParams::SelectedPenWidth)
   );
   graph->setAdaptiveSampling (true);
   graph->setName (name);
@@ -953,7 +986,7 @@ MainWindow::plotPolynomial (
   graph->setData (keys, values);
   graph->setPen (QPen (color));
   graph->setSelectedPen (
-    QPen (QBrush (color), Config::GUI::PlotParams::SelectedPenWidth)
+    QPen (QBrush (color), Config::Gui::PlotParams::SelectedPenWidth)
   );
   graph->setAdaptiveSampling (true);
   graph->setName (name);
@@ -1005,7 +1038,7 @@ MainWindow::plotBoundingBox (
 void
 MainWindow::plotMax (
   const std::function<Math::Float (Math::Float)>& func, int samplesCount,
-  double keyStart, double keyEnd, const QColor& color,
+  double keyStart, double keyEnd, const QColor& color, const QColor& pointColor,
   QCustomPlot* customPlot
 )
 {
@@ -1032,10 +1065,10 @@ MainWindow::plotMax (
   QCPItemStraightLine* const line (new QCPItemStraightLine (customPlot));
   line->setPen (QPen (color));
   line->setSelectedPen (
-    QPen (QBrush (color), Config::GUI::PlotParams::SelectedPenWidth)
+    QPen (QBrush (color), Config::Gui::PlotParams::SelectedPenWidth)
   );
-  line->point1->setCoords (maxKey, -1);
-  line->point2->setCoords (maxKey, 1);
+  line->point1->setCoords (maxKey, -1.);
+  line->point2->setCoords (maxKey, 1.);
   line->setSelectable (true);
   customPlot->addItem (line);
 
@@ -1045,13 +1078,15 @@ MainWindow::plotMax (
   ellipse->topLeft->setCoords (maxKey - .0075, .0075);
   ellipse->bottomRight->setType (QCPItemPosition::ptPlotCoords);
   ellipse->bottomRight->setCoords (maxKey + .0075, -.0075);
-  // TODO: [~-] Do not use solid fill.
-  ellipse->setPen (QPen (Qt::magenta));
+  ellipse->setPen (QPen (pointColor));
   ellipse->setSelectedPen (
-    QPen (QBrush (Qt::magenta), Config::GUI::PlotParams::SelectedPenWidth)
+    QPen (QBrush (pointColor), Config::Gui::PlotParams::SelectedPenWidth)
   );
-  ellipse->setBrush (QBrush (Qt::magenta));
-  ellipse->setSelectedBrush (QBrush (Qt::magenta));
+  ellipse->setBrush (QBrush (pointColor));
+  QColor newColor (pointColor);
+  newColor.setAlpha (127);
+  ellipse->setSelectedBrush (QBrush (newColor));
+  ellipse->setSelectable (true);
   customPlot->addItem (ellipse);
 
   ui_->prop_x_0_LcdNumber->display (maxKey);
