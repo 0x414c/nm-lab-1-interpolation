@@ -3,7 +3,7 @@
 
 /*
  * This is a (very) simple and lighweight (thus limited)
- * alternative to the `boost/cstdfloat'.
+ * alternative to the `boost/cstdfloat' (which doesn't work on MinGW's GCC).
  * See the N3626 proposal for more info.
  */
 
@@ -19,6 +19,83 @@
 
 namespace Math
 {
+  static_assert (
+    std::numeric_limits<float>::is_iec559,
+    "Fundamental type `float' does not conform to the IEEE 754 standard."
+  );
+
+  static_assert (
+    std::numeric_limits<double>::is_iec559,
+    "Fundamental type `double' does not conform to the IEEE 754 standard."
+  );
+
+  static_assert (
+    std::numeric_limits<long double>::is_iec559,
+    "Fundamental type `long double' does not conform to the IEEE 754 standard."
+  );
+
+#ifdef QUAD_PRECISION_ENABLED
+  static_assert (
+    std::numeric_limits<boost::multiprecision::float128>::is_iec559,
+    "External type `boost::multiprecision::float128' does not"
+    " conform to the IEEE 754 standard."
+  );
+#endif // QUAD_PRECISION_ENABLED
+
+
+  /* FLT_EVAL_METHOD (implementation defined macro):
+     Specifies the precision in which all floating-point arithmetic
+     operations other than assignment and cast are done.
+     Value    Explanation
+     negative implementation-defined behavior
+     -1       the default precision is not known (-mfpmath=both)
+      0       all operations and constants evaluate in the range and precision
+              of the type used.
+              Additionally, `float_t' and `double_t are equivalent to
+              `float' and `double' respectively (-mfpmath=sse)
+      1       all operations and constants evaluate in the range and
+              precision of `double'.
+              Additionally, both `float_t' and `double_t' are
+              equivalent to `double'
+      2       all operations and constants evaluate in the range
+              and precision of `long double'.
+              Additionally, both `float_t' and `double_t' are equivalent
+              to `long double' (-mfpmath=387)
+
+     ??? This ought to change with the setting of the fp control word;
+     the value provided by the compiler assumes the widest setting.
+  */
+
+  // Most efficient floating-point type at least as wide as `float' (32 bits).
+  // The actual width depends on `FLT_EVAL_METHOD'.
+  using Float32Fast = std::float_t;
+
+  // Most efficient floating-point type at least as wide as `double' (64 bits).
+  // The actual width depends on `FLT_EVAL_METHOD'.
+  using Float64Fast = std::double_t;
+
+  // Fixed-width IEEE 754 compliant floating point types.
+  using Float32 = float;
+  using Float64 = double; // Or `__float80'?
+  // NOTE: Extended float is a nasty thing. The real width of `long double'
+  // can be either 96 or 128 bits according to GCC's alignment switches
+  // (`-m96bit-long-double' and `-m128bit-long-double'). These adds padding
+  // only, not any extra precision (and can lead to ABI compatibility issues).
+  // NOTE: The precision of the x87 FPU can be adjusted w/ `-mpc{32, 64, 80}'
+  // switches (these will not change the actual width of `long double' type).
+  using Float80 = long double;
+#ifdef QUAD_PRECISION_ENABLED
+  using Float128 = boost::multiprecision::float128;
+#endif // QUAD_PRECISION_ENABLED
+
+  // "Generic" floating point type.
+#ifdef QUAD_PRECISION_ENABLED
+  using Float = Float128;
+#else
+  using Float = Float80;
+#endif // QUAD_PRECISION_ENABLED
+
+
   // Fixed-width integer types.
   using Integer8 = int8_t;
   using Integer16 = int16_t;
@@ -54,56 +131,6 @@ namespace Math
 
   // "Generic" unsigned integer type.
   using UInteger = UIntegerMax;
-
-
-  static_assert (
-    std::numeric_limits<float>::is_iec559,
-    "Fundamental type `float' does not conform to the IEEE 754 standard."
-  );
-
-  static_assert (
-    std::numeric_limits<double>::is_iec559,
-    "Fundamental type `double' does not conform to the IEEE 754 standard."
-  );
-
-  static_assert (
-    std::numeric_limits<long double>::is_iec559,
-    "Fundamental type `long double' does not conform to the IEEE 754 standard."
-  );
-
-#ifdef QUAD_PRECISION_ENABLED
-  static_assert (
-    std::numeric_limits<boost::multiprecision::float128>::is_iec559,
-    "External type `boost::multiprecision::float128' does not"
-    " conform to the IEEE 754 standard."
-  );
-#endif // QUAD_PRECISION_ENABLED
-
-
-  // Most efficient floating-point type at least as wide as `float' (32 bits).
-  using Float32Fast = std::float_t;
-
-  // Most efficient floating-point type at least as wide as `double' (64 bits).
-  using Float64Fast = std::double_t;
-
-  // Fixed-width IEEE 754 compliant floating point types.
-  using Float32 = float;
-  using Float64 = double; // Or `__float80'?
-  // NOTE: Extended float is a nasty thing. The real size of `long double' can
-  // be either 96 or 128 bits according to GCC's alignment switches
-  // (`-m96bit-long-double' and `-m128bit-long-double'). These adds padding
-  // only, not any extra precision (and can lead to ABI compatibility issues).
-  using Float80 = long double;
-#ifdef QUAD_PRECISION_ENABLED
-  using Float128 = boost::multiprecision::float128;
-#endif // QUAD_PRECISION_ENABLED
-
-  // "Generic" floating point type.
-#ifdef QUAD_PRECISION_ENABLED
-  using Float = Float128;
-#else
-  using Float = Float80;
-#endif // QUAD_PRECISION_ENABLED
 }
 
 

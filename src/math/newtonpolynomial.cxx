@@ -86,22 +86,51 @@ namespace Math
   Float
   NewtonPolynomial::operator () (Float t) const
   {
-//    return valueAt_g_n (t);
-    return valueAt_p_k (t);
+    return valueAt__p_c (t);
+//    return valueAt__g_n (t);
   }
 
 
   Float
-  NewtonPolynomial::valueAt_g_n (Float t) const
+  NewtonPolynomial::valueAt__p_c (Float t) const
+  {
+    // Var. #2: Kahan summation (aka compensated summation)
+    Float sum (0), correction (0);
+
+    for (size_t k (0); k < n_; ++k)
+    {
+      // Var. #4: Pairwise-like division
+      Float prod (1);
+
+      // TODO: [~~] Reuse results from previous step.
+      for (size_t i (0); i < k; ++i)
+      {
+        prod *= (t - Float (i)) / (Float (k) - Float (i));
+      }
+
+      prod *= finDiffs_[k][0];
+
+      const Float correctedNextTerm (prod - correction);
+      const Float newSum (sum + correctedNextTerm);
+      correction = (newSum - sum) - correctedNextTerm;
+      sum = newSum;
+    }
+
+    return sum;
+  }
+
+
+  Float
+  NewtonPolynomial::valueAt__g_n (Float t) const
   {
     Float sum (0);
 
-    // Var. #1: naïve summation
+    // Var. #1: Naïve summation
     for (size_t k (0); k < n_; ++k)
     {
       // Var. #1: Factorial via Gamma function, falling factorial via division
       // Overflow at k = 173 w/ Float64
-      sum += fallingFactorial_g (t, Float (k)) / factorial_g (Float (k)) *
+      sum += fallingFactorial__g_d (t, Float (k)) / factorial__g (Float (k)) *
              finDiffs_[k][0];
 
       // Var #2: Factorials via iterative multiplication
@@ -126,34 +155,6 @@ namespace Math
 
 //        sum += prod * finDiffs_[k][0];
 //      }
-    }
-
-    return sum;
-  }
-
-
-  Float
-  NewtonPolynomial::valueAt_p_k (Float t) const
-  {
-    // Var. #2: Kahan summation (aka compensated summation)
-    Float sum (0), correction (0);
-
-    for (size_t k (0); k < n_; ++k)
-    {
-      // Var. #4: Pairwise-like division
-      Float prod (1);
-
-      for (size_t i (0); i < k; ++i)
-      {
-        prod *= (t - Float (i)) / (Float (k) - Float (i));
-      }
-
-      prod *= finDiffs_[k][0];
-
-      const Float correctedNextTerm (prod - correction);
-      const Float newSum (sum + correctedNextTerm);
-      correction = (newSum - sum) - correctedNextTerm;
-      sum = newSum;
     }
 
     return sum;

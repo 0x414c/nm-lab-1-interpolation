@@ -39,9 +39,9 @@ namespace Config
 
     namespace PlotParams
     {
-      constexpr int Resolution = 100;
+      constexpr int ResolutionMultiplier = 2;
 
-      constexpr double Margin = .25;
+      constexpr double Margins = .25;
 
       constexpr double SelectedPenWidth = 2.;
 

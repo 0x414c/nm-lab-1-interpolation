@@ -31,7 +31,7 @@ namespace Math
 
 
   UInteger
-  factorial_i (UInteger n)
+  factorial__i (UInteger n)
   {
     UInteger prod (1);
 
@@ -45,7 +45,7 @@ namespace Math
 
 
   Float
-  factorial_i (Float n)
+  factorial__i (Float n)
   {
     Float prod (1);
 
@@ -59,21 +59,21 @@ namespace Math
 
 
   UInteger
-  fallingFactorial_i (UInteger n, UInteger k)
+  fallingFactorial__i_d (UInteger n, UInteger k)
   {
-    return (factorial_i (n) / factorial_i (n - k));
+    return (factorial__i (n) / factorial__i (n - k));
   }
 
 
   Float
-  fallingFactorial_i (Float n, Float k)
+  fallingFactorial__i_d (Float n, Float k)
   {
-    return (factorial_i (n) / factorial_i (n - k));
+    return (factorial__i (n) / factorial__i (n - k));
   }
 
 
   UInteger
-  fallingFactorial_i_i (UInteger n, UInteger k)
+  fallingFactorial__i (UInteger n, UInteger k)
   {
     UInteger prod (1);
 
@@ -87,7 +87,7 @@ namespace Math
 
 
   Float
-  fallingFactorial_i_i (Float n, Float k)
+  fallingFactorial__i (Float n, Float k)
   {
     Float prod (1);
 
@@ -101,7 +101,7 @@ namespace Math
 
 
   Float64
-  factorial_g (Float64 n)
+  factorial__g (Float64 n)
   {
     const Float64 ret (std::tgamma (n + 1));
 
@@ -120,7 +120,7 @@ namespace Math
 
 #ifdef QUAD_PRECISION_ENABLED
   Float128
-  factorial_g (Float128 n)
+  factorial__g (Float128 n)
   {
     using boost::math::policies::policy;
     using boost::math::policies::errno_on_error;
@@ -154,17 +154,17 @@ namespace Math
 
 
   Float64
-  fallingFactorial_g (Float64 n, Float64 k)
+  fallingFactorial__g_d (Float64 n, Float64 k)
   {
-    return (factorial_g (n) / factorial_g (n - k));
+    return (factorial__g (n) / factorial__g (n - k));
   }
 
 
 #ifdef QUAD_PRECISION_ENABLED
   Float128
-  fallingFactorial_g (Float128 n, Float128 k)
+  fallingFactorial__g_d (Float128 n, Float128 k)
   {
-    return (factorial_g (n) / factorial_g (n - k));
+    return (factorial__g (n) / factorial__g (n - k));
   }
 #endif // QUAD_PRECISION_ENABLED
 }

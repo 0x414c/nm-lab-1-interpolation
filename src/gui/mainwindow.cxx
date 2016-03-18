@@ -754,11 +754,13 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
 
   const int samplesCount (
     std::round (
-      double (Resolution) * (wndParam_B_ - wndParam_A_) + 1.
+      ResolutionMultiplier * customPlot->axisRect ()->size ().width () + 1
     )
   );
 
-//  qDebug () << "samplesCount ==" << samplesCount;
+//  qDebug ()
+//    << "samplesCount ==" << samplesCount
+//    << "; width ==" << customPlot->axisRect ()->size ().width ();
 
   const function<Math::Float (Math::Float)> f (
     std::bind (
@@ -852,8 +854,8 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
 
   customPlot->rescaleAxes (true);
 
-  customPlot->xAxis->setRange (wndParam_A_ - Margin, wndParam_B_ + Margin);
-  customPlot->yAxis->setRange (wndParam_C_ - Margin, wndParam_D_ + Margin);
+  customPlot->xAxis->setRange (wndParam_A_ - Margins, wndParam_B_ + Margins);
+  customPlot->yAxis->setRange (wndParam_C_ - Margins, wndParam_D_ + Margins);
 
   customPlot->replot ();
 }
@@ -898,7 +900,7 @@ MainWindow::plotFunction (
   graph->setSelectedPen (
     QPen (QBrush (color), Config::GUI::PlotParams::SelectedPenWidth)
   );
-//  graph->setAdaptiveSampling (true);
+  graph->setAdaptiveSampling (true);
   graph->setName (name);
 
 //  customPlot->replot ();
@@ -953,10 +955,10 @@ MainWindow::plotPolynomial (
   graph->setSelectedPen (
     QPen (QBrush (color), Config::GUI::PlotParams::SelectedPenWidth)
   );
-//  graph->setAdaptiveSampling (true);
+  graph->setAdaptiveSampling (true);
   graph->setName (name);
 
-  //  customPlot->replot ();
+//  customPlot->replot ();
 }
 
 
