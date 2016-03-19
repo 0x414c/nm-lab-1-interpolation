@@ -1,12 +1,12 @@
 ﻿#include <cmath>
 #include <cstddef>
 
-#include <algorithm>
 #include <functional>
 #include <limits>
 
 #include <QBrush>
 #include <QColor>
+#include <QFont>
 #include <QLocale>
 #include <QMainWindow>
 #include <QMouseEvent>

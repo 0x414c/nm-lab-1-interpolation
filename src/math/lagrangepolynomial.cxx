@@ -84,7 +84,6 @@ namespace Math
     {
       Float C_k (1);
 
-      // TODO: [~~] Reuse results from previous step.
       for (size_t i (0); i < k; ++i)
       {
         C_k *= (x - x_[i]) / (x_[k] - x_[i]);

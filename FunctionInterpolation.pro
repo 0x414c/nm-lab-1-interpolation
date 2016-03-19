@@ -20,9 +20,7 @@ CONFIG(release, debug|release) {
   message("Building `release' target")
   QMAKE_CXXFLAGS_RELEASE += -O2 -mtune=generic
 #  QMAKE_CXXFLAGS_RELEASE += -O3 -mtune=native
-}
-
-CONFIG(debug, debug|release) {
+} else {
   message("Building `debug' target")
   QMAKE_CXXFLAGS_DEBUG += -O0 -march=native
 }
@@ -34,6 +32,8 @@ equals(QT_ARCH, x86_64) {
   equals(QT_ARCH, i386) {
     message("Building for `i386' target")
     QMAKE_CXXFLAGS += -m32
+  } else {
+    message("Unknown arch `$$QT_ARCH' detected")
   }
 }
 
@@ -58,8 +58,8 @@ QMAKE_EXT_H += hxx
 INCLUDEPATH += \
   $$PWD/lib/qcustomplot
 
-LIBS += \
-  -lquadmath
+#LIBS += \
+#  -lquadmath
 
 SOURCES += \
   lib/qcustomplot/qcustomplot/qcustomplot.cpp \

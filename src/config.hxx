@@ -83,7 +83,9 @@ namespace Config
 
   namespace MathConstants
   {
-    constexpr double Epsilon = 1E-16;
+//    constexpr Math::Float32 Epsilon = 1E-5F;
+//    constexpr Math::Float64 Epsilon = 1E-14;
+    constexpr Math::Float80 Epsilon = 1E-17L;
   }
 }
 

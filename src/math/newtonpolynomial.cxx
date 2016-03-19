@@ -94,22 +94,14 @@ namespace Math
   NewtonPolynomial::valueAt__p_c (Float t) const
   {
     // Var. #2: Kahan summation (aka compensated summation)
-    Float sum (0), correction (0);
+    Float sum (finDiffs_[0][0]), correction (0), prod (1);
 
-    for (size_t k (0); k < n_; ++k)
+    for (size_t k (1); k < n_; ++k)
     {
       // Var. #4: Pairwise-like division
-      Float prod (1);
+      prod *= (t - Float (k - 1)) / Float (k);
 
-      // TODO: [~~] Reuse results from previous step.
-      for (size_t i (0); i < k; ++i)
-      {
-        prod *= (t - Float (i)) / (Float (k) - Float (i));
-      }
-
-      prod *= finDiffs_[k][0];
-
-      const Float correctedNextTerm (prod - correction);
+      const Float correctedNextTerm (prod * finDiffs_[k][0] - correction);
       const Float newSum (sum + correctedNextTerm);
       correction = (newSum - sum) - correctedNextTerm;
       sum = newSum;
