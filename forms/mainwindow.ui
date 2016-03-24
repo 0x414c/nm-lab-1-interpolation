@@ -377,6 +377,9 @@
        </item>
        <item row="0" column="1">
         <widget class="QLCDNumber" name="prop_x_0_LcdNumber">
+         <property name="digitCount">
+          <number>8</number>
+         </property>
          <property name="segmentStyle">
           <enum>QLCDNumber::Flat</enum>
          </property>
@@ -391,6 +394,9 @@
        </item>
        <item row="1" column="1">
         <widget class="QLCDNumber" name="prop_delta_LcdNumber">
+         <property name="digitCount">
+          <number>8</number>
+         </property>
          <property name="segmentStyle">
           <enum>QLCDNumber::Flat</enum>
          </property>
@@ -465,7 +471,7 @@
       <x>241</x>
       <y>58</y>
       <width>110</width>
-      <height>182</height>
+      <height>186</height>
      </rect>
     </property>
     <property name="autoFillBackground">

@@ -76,14 +76,14 @@ namespace Math
 
   // Fixed-width IEEE 754 compliant floating point types.
   using Float32 = float;
-  using Float64 = double; // Or `__float80'?
+  using Float64 = double;
   // NOTE: Extended float is a nasty thing. The real width of `long double'
   // can be either 96 or 128 bits according to GCC's alignment switches
   // (`-m96bit-long-double' and `-m128bit-long-double'). These adds padding
   // only, not any extra precision (and can lead to ABI compatibility issues).
   // NOTE: The precision of the x87 FPU can be adjusted w/ `-mpc{32, 64, 80}'
   // switches (these will not change the actual width of `long double' type).
-  using Float80 = long double;
+  using Float80 = long double; // Or `__float80'?
 #ifdef QUAD_PRECISION_ENABLED
   using Float128 = boost::multiprecision::float128;
 #endif // QUAD_PRECISION_ENABLED
