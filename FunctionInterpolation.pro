@@ -72,6 +72,7 @@ SOURCES += \
 HEADERS += \
   lib/qcustomplot/qcustomplot/qcustomplot.h \
   src/config.hxx \
+  src/globaldefines.hxx \
   src/gui/mainwindow.hxx \
   src/math/functions.hxx \
   src/math/mathutils.hxx \

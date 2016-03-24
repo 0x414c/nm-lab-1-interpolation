@@ -2,34 +2,46 @@
 #define MATHUTILS_HXX
 
 
+#include "../globaldefines.hxx"
+
 #include "numerictypes.hxx"
 
 
 namespace Math
 {
   // TODO: [~-] Inline?
-  Float lerp (Float x1, Float y1, Float x2, Float y2, Float x0);
+  real_t lerp (real_t x1, real_t y1, real_t x2, real_t y2, real_t x0);
 
-  Float clamp (Float a, Float b, Float x);
+  real_t clamp (real_t a, real_t b, real_t x);
 
-  UInteger factorial__i (UInteger n);
-  Float factorial__i (Float n);
+  uinteger_t factorial__i (uinteger_t n);
+  real_t factorial__i (real_t n);
 
-  UInteger fallingFactorial__i_d (UInteger n, UInteger k);
-  Float fallingFactorial__i_d (Float n, Float k);
+  uinteger_t fallingFactorial__i_d (uinteger_t n, uinteger_t k);
+  real_t fallingFactorial__i_d (real_t n, real_t k);
 
-  UInteger fallingFactorial__i (UInteger n, UInteger k);
-  Float fallingFactorial__i (Float n, Float k);
+  uinteger_t fallingFactorial__i (uinteger_t n, uinteger_t k);
+  real_t fallingFactorial__i (real_t n, real_t k);
 
-  Float64 factorial__g (Float64 n);
-#ifdef QUAD_PRECISION_ENABLED
-  Float128 factorial__g (Float128 n);
-#endif // QUAD_PRECISION_ENABLED
+#ifdef REAL_IS_BUILTIN
+  real_builtin_t factorial__g (real_builtin_t n);
+#else
+#ifdef REAL_IS_BOOST_FLOAT128
+  boost::multiprecision::float128 factorial__g (
+    boost::multiprecision::float128 n
+  );
+#endif // REAL_IS_BOOST_FLOAT128
+#endif // REAL_IS_BUILTIN
 
-  Float64 fallingFactorial__g_d (Float64 n, Float64 k);
-#ifdef QUAD_PRECISION_ENABLED
-  Float128 fallingFactorial__g_d (Float128 n, Float128 k);
-#endif // QUAD_PRECISION_ENABLED
+#ifdef REAL_IS_BUILTIN
+  real_builtin_t fallingFactorial__g_d (real_builtin_t n, real_builtin_t k);
+#else
+#ifdef REAL_IS_BOOST_FLOAT128
+  boost::multiprecision::float128 fallingFactorial__g_d (
+    boost::multiprecision::float128 n, boost::multiprecision::float128 k
+  );
+#endif // REAL_IS_BOOST_FLOAT128
+#endif // REAL_IS_BUILTIN
 }
 
 

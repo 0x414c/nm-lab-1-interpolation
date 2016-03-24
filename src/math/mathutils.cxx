@@ -1,13 +1,17 @@
-﻿#include <cmath>
+﻿#include "../globaldefines.hxx"
+
+#ifdef REAL_IS_BUILTIN
+#include <cmath>
+#endif // REAL_IS_BUILTIN
 
 #include <algorithm>
 #include <iostream>
 #include <limits>
 
-#ifdef QUAD_PRECISION_ENABLED
-#include <boost/cstdfloat.hpp>
-#include <boost/math/special_functions.hpp>
-#endif // QUAD_PRECISION_ENABLED
+#ifdef REAL_IS_BOOST_FLOAT128
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/math/special_functions/gamma.hpp>
+#endif // REAL_IS_BOOST_FLOAT128
 
 #include "mathutils.hxx"
 #include "numerictypes.hxx"
@@ -16,26 +20,26 @@
 
 namespace Math
 {
-  Float
-  lerp (Float x1, Float y1, Float x2, Float y2, Float x0)
+  real_t
+  lerp (real_t x1, real_t y1, real_t x2, real_t y2, real_t x0)
   {
     return (y1 + (y2 - y1) * ((x0 - x1) / (x2 - x1)));
   }
 
 
-  Float
-  clamp (Float a, Float b, Float x)
+  real_t
+  clamp (real_t a, real_t b, real_t x)
   {
     return std::max (a, std::min (b, x));
   }
 
 
-  UInteger
-  factorial__i (UInteger n)
+  uinteger_t
+  factorial__i (uinteger_t n)
   {
-    UInteger prod (1);
+    uinteger_t prod (1);
 
-    for (UInteger i (2); i <= n; ++i)
+    for (uinteger_t i (2); i <= n; ++i)
     {
       prod *= i;
     }
@@ -44,12 +48,12 @@ namespace Math
   }
 
 
-  Float
-  factorial__i (Float n)
+  real_t
+  factorial__i (real_t n)
   {
-    Float prod (1);
+    real_t prod (1);
 
-    for (Float i (2); i <= n; ++i)
+    for (real_t i (2); i <= n; ++i)
     {
       prod *= i;
     }
@@ -58,26 +62,26 @@ namespace Math
   }
 
 
-  UInteger
-  fallingFactorial__i_d (UInteger n, UInteger k)
+  uinteger_t
+  fallingFactorial__i_d (uinteger_t n, uinteger_t k)
   {
     return (factorial__i (n) / factorial__i (n - k));
   }
 
 
-  Float
-  fallingFactorial__i_d (Float n, Float k)
+  real_t
+  fallingFactorial__i_d (real_t n, real_t k)
   {
     return (factorial__i (n) / factorial__i (n - k));
   }
 
 
-  UInteger
-  fallingFactorial__i (UInteger n, UInteger k)
+  uinteger_t
+  fallingFactorial__i (uinteger_t n, uinteger_t k)
   {
-    UInteger prod (1);
+    uinteger_t prod (1);
 
-    for (UInteger i (0); i < k; ++i)
+    for (uinteger_t i (0); i < k; ++i)
     {
       prod *= n - i;
     }
@@ -86,12 +90,12 @@ namespace Math
   }
 
 
-  Float
-  fallingFactorial__i (Float n, Float k)
+  real_t
+  fallingFactorial__i (real_t n, real_t k)
   {
-    Float prod (1);
+    real_t prod (1);
 
-    for (Float i (0); i < k; ++i)
+    for (real_t i (0); i < k; ++i)
     {
       prod *= n - i;
     }
@@ -100,27 +104,27 @@ namespace Math
   }
 
 
-  Float64
-  factorial__g (Float64 n)
+#ifdef REAL_IS_BUILTIN
+  real_builtin_t
+  factorial__g (real_builtin_t n)
   {
-    const Float64 ret (std::tgamma (n + 1));
+    const real_builtin_t ret (std::tgamma (n + REAL_BUILTIN_C (1.)));
 
     // HACK: Unifies std::tgamma and boost::tgamma return values
     // due to strange bug in std::tgamma.
     if (std::isnan (ret) || std::isinf (ret))
     {
-      return std::numeric_limits<Float64>::infinity ();
+      return std::numeric_limits<real_builtin_t>::infinity ();
     }
     else
     {
       return ret;
     }
   }
-
-
-#ifdef QUAD_PRECISION_ENABLED
-  Float128
-  factorial__g (Float128 n)
+#else
+#ifdef REAL_IS_BOOST_FLOAT128
+  boost::multiprecision::float128
+  factorial__g (boost::multiprecision::float128 n)
   {
     using boost::math::policies::policy;
     using boost::math::policies::errno_on_error;
@@ -139,32 +143,38 @@ namespace Math
 
     // HACK: This is added to unify std::tgamma and boost::tgamma return values
     // due to strange bug in std::tgamma.
-    const Float128 ret (boost::math::tgamma (n + 1, errnoPolicy ()));
+    const boost::multiprecision::float128 ret (
+      boost::math::tgamma (n + REAL_EXTERNAL_C (1.), errnoPolicy ())
+    );
 
     if (boost::math::isnan (ret) || boost::math::isinf (ret))
     {
-      return std::numeric_limits<Float128>::infinity ();
+      return std::numeric_limits<boost::multiprecision::float128>::infinity ();
     }
     else
     {
       return ret;
     }
   }
-#endif // QUAD_PRECISION_ENABLED
+#endif // REAL_IS_BOOST_FLOAT128
+#endif // REAL_IS_BUILTIN
 
 
-  Float64
-  fallingFactorial__g_d (Float64 n, Float64 k)
+#ifdef REAL_IS_BUILTIN
+  real_builtin_t
+  fallingFactorial__g_d (real_builtin_t n, real_builtin_t k)
   {
     return (factorial__g (n) / factorial__g (n - k));
   }
-
-
-#ifdef QUAD_PRECISION_ENABLED
-  Float128
-  fallingFactorial__g_d (Float128 n, Float128 k)
+#else
+#ifdef REAL_IS_BOOST_FLOAT128
+  boost::multiprecision::float128
+  fallingFactorial__g_d (
+    boost::multiprecision::float128 n, boost::multiprecision::float128 k
+  )
   {
     return (factorial__g (n) / factorial__g (n - k));
   }
-#endif // QUAD_PRECISION_ENABLED
+#endif // REAL_IS_BOOST_FLOAT128
+#endif // REAL_IS_BUILTIN
 }

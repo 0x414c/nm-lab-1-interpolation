@@ -1,4 +1,8 @@
-﻿#include <cmath>
+﻿#include "../globaldefines.hxx"
+
+#ifndef REAL_IS_BUILTIN
+#include <cmath>
+#endif // REAL_IS_BUILTIN
 #include <cstddef>
 
 #include <functional>
@@ -6,9 +10,9 @@
 #include <stdexcept>
 #include <vector>
 
-#ifdef QUAD_PRECISION_ENABLED
+#ifdef REAL_IS_BOOST_FLOAT128
 #include <boost/math/special_functions/fpclassify.hpp>
-#endif // QUAD_PRECISION_ENABLED
+#endif // REAL_IS_BOOST_FLOAT128
 
 #include "lagrangepolynomial.hxx"
 #include "mathutils.hxx"
@@ -19,8 +23,8 @@
 namespace Math
 {
   LagrangePolynomial::LagrangePolynomial (
-    const std::function<Float (Float)>& func,
-    Float x_0, Float x_n_1, size_t n
+    const std::function<real_t (real_t)>& func,
+    real_t x_0, real_t x_n_1, size_t n
   ) throw (std::invalid_argument) :
     n_ (n)
   {
@@ -34,22 +38,22 @@ namespace Math
       throw std::invalid_argument ("`x_0' should be less than `x_n_1'.");
     }
 
-    x_ = std::vector <Float> (n_);
-    y_ = std::vector <Float> (n_);
+    x_ = std::vector <real_t> (n_);
+    y_ = std::vector <real_t> (n_);
 
-    const Float h ((x_n_1 - x_0) / Float (n_ - 1));
+    const real_t h ((x_n_1 - x_0) / real_t (n_ - 1));
 
     for (size_t k (0); k < n_; ++k)
     {
-      x_[k] = x_0 + Float (k) * h;
+      x_[k] = x_0 + real_t (k) * h;
 
-      const Float y_k (func (x_[k]));
+      const real_t y_k (func (x_[k]));
 
-#ifdef QUAD_PRECISION_ENABLED
+#ifdef REAL_IS_BOOST_FLOAT128
       if (boost::math::isnan (y_k))
 #else
       if (std::isnan (y_k))
-#endif // QUAD_PRECISION_ENABLED
+#endif // REAL_IS_BOOST_FLOAT128
       {
         using Config::MathConstants::Epsilon;
 
@@ -68,21 +72,21 @@ namespace Math
   }
 
 
-  Float
-  LagrangePolynomial::operator () (Float x) const
+  real_t
+  LagrangePolynomial::operator () (real_t x) const
   {
     return valueAt (x);
   }
 
 
-  Float
-  LagrangePolynomial::valueAt (Float x) const
+  real_t
+  LagrangePolynomial::valueAt (real_t x) const
   {
-    Float sum (0), correction (0);
+    real_t sum (0), correction (0);
 
     for (size_t k (0); k < n_; ++k)
     {
-      Float C_k (1);
+      real_t C_k (1);
 
       for (size_t i (0); i < k; ++i)
       {
@@ -96,8 +100,8 @@ namespace Math
 
       C_k *= y_[k];
 
-      const Float correctedNextTerm (C_k - correction);
-      const Float newSum (sum + correctedNextTerm);
+      const real_t correctedNextTerm (C_k - correction);
+      const real_t newSum (sum + correctedNextTerm);
       correction = (newSum - sum) - correctedNextTerm;
       sum = newSum;
     }

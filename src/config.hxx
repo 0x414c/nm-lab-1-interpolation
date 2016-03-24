@@ -2,6 +2,8 @@
 #define CONFIG_HXX
 
 
+#include "globaldefines.hxx"
+
 #include <utility>
 
 #include <QColor>
@@ -47,7 +49,7 @@ namespace Config
 
     namespace PlotParams
     {
-      constexpr int ResolutionMultiplier = 2;
+      constexpr int ResolutionMultiplier = 1;
 
       constexpr double Margins = .25;
 
@@ -83,10 +85,27 @@ namespace Config
 
   namespace MathConstants
   {
-//    constexpr Math::Float32 Epsilon = 1E-5F;
-//    constexpr Math::Float64 Epsilon = 1E-14;
-//    constexpr Math::Float80 Epsilon = 1E-17L;
-    constexpr Math::Float128 Epsilon = 1E-32Q;
+#ifdef REAL_IS_BOOST_FLOAT128
+    constexpr Math::real_t Epsilon = REAL_C (1E-32);
+#else
+#ifdef REAL_IS_GCC_FLOAT80
+    constexpr Math::real_t Epsilon = REAL_C (1E-17);
+#else
+#ifdef REAL_IS_LONG_DOUBLE
+    constexpr Math::real_t Epsilon = REAL_C (1E-17);
+#else
+#ifdef REAL_IS_DOUBLE
+    constexpr Math::real_t Epsilon = REAL_C (1E-14);
+#else
+#ifdef REAL_IS_FLOAT
+    constexpr Math::real_t Epsilon = REAL_C (1E-5);
+#else
+#error "`MathConstants::Epsilon' cannot be defined."
+#endif // REAL_IS_FLOAT
+#endif // REAL_IS_DOUBLE
+#endif // REAL_IS_LONG_DOUBLE
+#endif // REAL_IS_GCC_FLOAT80
+#endif // REAL_IS_BOOST_FLOAT128
   }
 }
 

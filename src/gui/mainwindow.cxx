@@ -655,12 +655,7 @@ MainWindow::initCustomPlot (QCustomPlot* customPlot)
     QLocale (QLocale::English, QLocale::UnitedStates)
   );
 
-//  customPlot->setNoAntialiasingOnDrag (true);
-//  customPlot->setNotAntialiasedElements (QCP::aeAll);
   customPlot->setAntialiasedElements (QCP::aeAll);
-
-//  customPlot->plotLayout ()->insertRow (0);
-//  customPlot->plotLayout ()->addElement (0, 0, new QCPPlotTitle (customPlot, "Plot (1)."));
 
   customPlot->legend->setVisible (true);
   customPlot->legend->setFont (normalFont);
@@ -672,7 +667,6 @@ MainWindow::initCustomPlot (QCustomPlot* customPlot)
   customPlot->setBackgroundScaled (true);
   customPlot->setBackgroundScaledMode (Qt::IgnoreAspectRatio);
 
-//  customPlot->axisRect ()->setupFullAxesBox (true);
   customPlot->xAxis2->setVisible (true);
   customPlot->xAxis2->setTickLabels (false);
 
@@ -692,6 +686,14 @@ MainWindow::initCustomPlot (QCustomPlot* customPlot)
 
   customPlot->xAxis->setLabel (QStringLiteral ("x"));
   customPlot->yAxis->setLabel (QStringLiteral ("y"));
+
+  QCPPlotTitle* const plotTitle (new QCPPlotTitle (customPlot));
+  plotTitle->setText (
+    QStringLiteral ("#1 // Интерполирование функций // Алексей Горишный // группа ИТ-32БО")
+  );
+  plotTitle->setFont (normalFont);
+  customPlot->plotLayout ()->insertRow (0);
+  customPlot->plotLayout ()->addElement (0, 0, plotTitle);
 
   connect (
     customPlot, SIGNAL (selectionChangedByUser (void)),
@@ -777,7 +779,7 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
   );
 
 
-  const function<Math::Float (Math::Float)> f (
+  const function<Math::real_t (Math::real_t)> f (
     std::bind (
       Math::f,
       _1, funcParam_alpha_, funcParam_beta_, funcParam_gamma_,
@@ -785,7 +787,7 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
     )
   );
 
-  const function<Math::Float (Math::Float)> d_f (
+  const function<Math::real_t (Math::real_t)> d_f (
     std::bind (
       Math::d, f, _1, interpParam_delta_
     )
@@ -795,7 +797,7 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
     f, wndParam_A_, wndParam_B_, interpParam_n_
   );
 
-  const function<Math::Float (Math::Float)> d_P_n (
+  const function<Math::real_t (Math::real_t)> d_P_n (
     std::bind (
       Math::d,
       P_n,
@@ -807,7 +809,7 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
     )
   );
 
-  const function<Math::Float (Math::Float)> r_n (
+  const function<Math::real_t (Math::real_t)> r_n (
     std::bind (
       Math::r_n,
       f, P_n, _1,
@@ -896,7 +898,7 @@ MainWindow::updateCustomPlot (QCustomPlot* customPlot)
 
 void
 MainWindow::plotFunction (
-  const std::function<Math::Float (Math::Float)>& func, int samplesCount,
+  const std::function<Math::real_t (Math::real_t)>& func, int samplesCount,
   double keyStart, double keyEnd, double valueStart, double valueEnd,
   const QColor& color, QCustomPlot* customPlot, const QString& name
 )
@@ -942,7 +944,7 @@ MainWindow::plotFunction (
 
 void
 MainWindow::plotPolynomial (
-  const std::function<Math::Float (Math::Float)>& func, int samplesCount, int stepsCount,
+  const std::function<Math::real_t (Math::real_t)>& func, int samplesCount, int stepsCount,
   double keyStart, double keyEnd, double valueStart, double valueEnd,
   const QColor& color, QCustomPlot* customPlot, const QString& name
 )
@@ -1037,7 +1039,7 @@ MainWindow::plotBoundingBox (
 
 void
 MainWindow::plotMax (
-  const std::function<Math::Float (Math::Float)>& func, int samplesCount,
+  const std::function<Math::real_t (Math::real_t)>& func, int samplesCount,
   double keyStart, double keyEnd, const QColor& color, const QColor& pointColor,
   QCustomPlot* customPlot
 )

@@ -17,18 +17,18 @@ namespace Math
   {
     public:
       LagrangePolynomial (
-        const std::function<Float (Float)>& func,
-        Float x_0, Float x_n_1, size_t n
+        const std::function<real_t (real_t)>& func,
+        real_t x_0, real_t x_n_1, size_t n
       ) throw (std::invalid_argument);
 
-      Float operator () (Float x) const;
+      real_t operator () (real_t x) const;
 
 
     private:
-      Float valueAt (Float x) const;
+      real_t valueAt (real_t x) const;
 
-      std::vector<Float> x_;
-      std::vector<Float> y_;
+      std::vector<real_t> x_;
+      std::vector<real_t> y_;
 
       size_t n_;
   };

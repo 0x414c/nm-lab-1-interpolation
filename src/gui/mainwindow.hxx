@@ -111,13 +111,13 @@ class MainWindow :
     void updateCustomPlot (QCustomPlot* customPlot);
 
     void plotFunction (
-      const std::function<Math::Float (Math::Float)>& f, int samplesCount,
+      const std::function<Math::real_t (Math::real_t)>& f, int samplesCount,
       double keyStart, double keyEnd, double valueStart, double valueEnd,
       const QColor& color, QCustomPlot* customPlot, const QString& name
     );
 
     void plotPolynomial (
-      const std::function<Math::Float (Math::Float)>& f, int samplesCount, int stepsCount,
+      const std::function<Math::real_t (Math::real_t)>& f, int samplesCount, int stepsCount,
       double keyStart, double keyEnd, double valueStart, double valueEnd,
       const QColor& color, QCustomPlot* customPlot, const QString& name
     );
@@ -128,7 +128,7 @@ class MainWindow :
     );
 
     void plotMax (
-      const std::function<Math::Float (Math::Float)>& func, int samplesCount,
+      const std::function<Math::real_t (Math::real_t)>& func, int samplesCount,
       double keyStart, double keyEnd,
       const QColor& color, const QColor& pointColor, QCustomPlot* customPlot
     );

@@ -17,20 +17,20 @@ namespace Math
   {
     public:
       NewtonPolynomial (
-        const std::function<Float (Float)>& func,
-        Float x_0, Float x_n_1, size_t n
+        const std::function<real_t (real_t)>& func,
+        real_t x_0, real_t x_n_1, size_t n
       ) throw (std::invalid_argument);
 
-      Float operator () (Float t) const;
+      real_t operator () (real_t t) const;
 
 
     private:
-      Float valueAt__p_c (Float t) const;
-      Float valueAt__g_n (Float t) const;
+      real_t valueAt__p_c (real_t t) const;
+      real_t valueAt__g_n (real_t t) const;
 
-      std::vector<std::vector<Float>> finDiffs_;
+      std::vector<std::vector<real_t>> finDiffs_;
 
-      std::vector<Float> x_;
+      std::vector<real_t> x_;
 
       size_t n_;
   };

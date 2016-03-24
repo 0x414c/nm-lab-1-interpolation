@@ -1,4 +1,8 @@
-﻿#include <cmath>
+﻿#include "../globaldefines.hxx"
+
+#ifndef REAL_IS_BUILTIN
+#include <cmath>
+#endif // REAL_IS_BUILTIN
 
 #include <functional>
 
@@ -8,37 +12,41 @@
 
 namespace Math
 {
-  using std::cos;
   using std::function;
-  using std::pow;
-  using std::sin;
 
 
-  Float
+  real_t
   f (
-    Float x,
-    Float alpha, Float beta, Float gamma,
-    Float delta, Float epsilon, Float mu
+    real_t x,
+    real_t alpha, real_t beta, real_t gamma,
+    real_t delta, real_t epsilon, real_t mu
   )
   {
+#ifdef REAL_IS_BOOST_FLOAT128
     return (
-      alpha * sin (beta / pow (x - gamma, 2)) +
-      delta * cos (epsilon / pow (x - mu, 2))
+      alpha * boost::multiprecision::sin (beta / boost::multiprecision::pow (x - gamma, REAL_EXTERNAL_C (2.))) +
+      delta * boost::multiprecision::cos (epsilon / boost::multiprecision::pow (x - mu, REAL_EXTERNAL_C (2.)))
     );
+#else
+    return (
+      alpha * std::sin (beta / std::pow (x - gamma, REAL_BUILTIN_C (2.))) +
+      delta * std::cos (epsilon / std::pow (x - mu, REAL_BUILTIN_C (2.)))
+    );
+#endif // REAL_IS_BOOST_FLOAT128
   }
 
 
-  Float
-  d (const function<Float (Float)>& func, Float x, Float delta)
+  real_t
+  d (const function<real_t (real_t)>& func, real_t x, real_t delta)
   {
     return ((func (x + delta) - func (x)) / delta);
   }
 
 
-  Float
+  real_t
   r_n (
-    const function<Float (Float)>& f, const function<Float (Float)>& P_n,
-    Float x, Float t
+    const function<real_t (real_t)>& f, const function<real_t (real_t)>& P_n,
+    real_t x, real_t t
   )
   {
     return (f (x) - P_n (t));

@@ -12,17 +12,17 @@ namespace Math
   using std::function;
 
 
-  Float f (
-    Float x,
-    Float alpha, Float beta, Float gamma,
-    Float delta, Float epsilon, Float mu
+  real_t f (
+    real_t x,
+    real_t alpha, real_t beta, real_t gamma,
+    real_t delta, real_t epsilon, real_t mu
   );
 
-  Float d (const function<Float (Float)>& func, Float x, Float delta);
+  real_t d (const function<real_t (real_t)>& func, real_t x, real_t delta);
 
-  Float r_n (
-    const function<Float (Float)>& f, const function<Float (Float)>& P_n,
-    Float x, Float t
+  real_t r_n (
+    const function<real_t (real_t)>& f, const function<real_t (real_t)>& P_n,
+    real_t x, real_t t
   );
 
 
