@@ -349,7 +349,8 @@ MainWindow::on_plot_functions_CustomPlot_mouseWheel (QWheelEvent* ev)
   else
   {
     if (
-      customPlot->yAxis->selectedParts ().testFlag (QCPAxis::spAxis))
+      customPlot->yAxis->selectedParts ().testFlag (QCPAxis::spAxis)
+    )
     {
       customPlot->axisRect ()->setRangeZoom (customPlot->yAxis->orientation ());
     }

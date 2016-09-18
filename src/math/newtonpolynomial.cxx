@@ -130,13 +130,13 @@ namespace Math
 
       // Var #2: Factorials via iterative multiplication
       // Overflow at k = 173 w/ float64_t
-//      sum += fallingFactorial_i_i (t, real_t (k)) / factorial_i (real_t (k)) *
+//      sum += fallingFactorial__i (t, real_t (k)) / factorial_i (real_t (k)) *
 //             finDiffs_[k][0];
 
       // Var. #3: Factorial via iterative multiplication,
       // falling factorial via division
       // Overflow at k = 173 w/ float64_t
-//      sum += fallingFactorial_i (t, real_t (k)) / factorial_i (real_t (k)) *
+//      sum += fallingFactorial__i_d (t, real_t (k)) / factorial_i (real_t (k)) *
 //             finDiffs_[k][0];
 
       // Var. #4: Pairwise-like division
